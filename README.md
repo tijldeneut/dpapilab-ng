@@ -1,8 +1,7 @@
-====================================================
 Windows DPAPI-NG lab in Python 3
+=================
 Forked from https://github.com/dfirfpi/dpapilab
  with every single file edited and several additions
-====================================================
 
 Here I want to put some ongoing works that involve 
 Windows DPAPI (Data Protection API). 
@@ -11,9 +10,9 @@ please see "How to Use" and ask questions.
 
 How to install
 --------------
-pip3 install wheel pytz pycryptodome python-registry construct==2.5.5-reupload
+``pip3 install wheel pytz pycryptodome python-registry construct==2.5.5-reupload``
 
-construct only needed for vaultdec (not ngcvaultdec)
+The construct package is only needed for vaultdec.py (not ngcvaultdec.py)
 pycryptodome (just like pycrypto) on Windows requires a C compiler:
 Get the Build Tools at 
 https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019 
