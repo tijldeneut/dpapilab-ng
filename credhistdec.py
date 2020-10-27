@@ -36,7 +36,8 @@ if __name__ == '__main__':
     """Utility core."""
     usage = (
         'usage: %prog [options] CREDHIST\n\n'
-        'It tries to decrypt a user CREDHIST file.'
+        'It tries to decrypt a user CREDHIST file.\n'
+        'AppData\\Roaming\\Microsoft\\Protect\\CREDHIST\n'
         'Needs either the current user SHA1 hash or cleartext password.')
 
     parser = optparse.OptionParser(usage=usage)

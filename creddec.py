@@ -75,7 +75,7 @@ def decrypt_credential_block(mkp, credential_block):
     return decrypt_blob(mkp, sblob)
 
 
-def helper_dec_err(err_value):
+def helper_dec_err(res):
     if res == 1:
         print('[-] MasterKey not found for blob.', file=sys.stderr)
     elif res == 2:
@@ -89,7 +89,14 @@ if __name__ == '__main__':
     usage = (
         'usage: %prog [options] credential1 credential2 ...\n\n'
         'It tries to decrypt user/system credential files.\n'
-        'Provide only system MK data for system credentials.')
+        '%appdata%\\Microsoft\\Credentials\\* or \n'
+        '%localappdata%\\Microsoft\\Credentials\\* or \n'
+        '\\Windows\\System32\\config\\systemprofile\\AppData\\Local\\Microsoft\\Credentials\\* or \n'
+        '\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local\\Microsoft\\Credentials\\*\n'
+        'Provide system MK data for system credentials:\n'
+        '\\Windows\\System32\\Microsoft\\Protect\\S-1-5-18\\User\n'
+        'or user MK data for user credentials:\n'
+        '%appdata%\\Microsoft\\Protect\\<User-SID>')
 
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('--masterkey', metavar='DIRECTORY', dest='masterkeydir')
@@ -135,7 +142,7 @@ if __name__ == '__main__':
             enc_cred = vaultstruct.CREDENTIAL_FILE.parse(fin.read())
 
             cred_blob = blob.DPAPIBlob(enc_cred.data.raw)
-            print(cred_blob)
+            #print(cred_blob)
 
             if umkp:
                 dec_cred, res_err = decrypt_blob(umkp, cred_blob)
