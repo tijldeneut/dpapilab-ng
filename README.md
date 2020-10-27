@@ -12,7 +12,7 @@ How to install
 --------------
 ``pip3 install wheel pytz pycryptodome python-registry construct==2.5.5-reupload``
 
-The construct package is only needed for vaultdec.py (not ngcvaultdec.py)
+The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py)
 pycryptodome (just like pycrypto) on Windows requires a C compiler:
 Get the Build Tools at 
 https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019 

@@ -47,14 +47,14 @@ except ImportError:
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
-    if not options.masterkeydir:
-        sys.exit('Cannot decrypt anything without master keys.')
-    if options.system and options.security:
-        return
     if not args or len(args) != 1:
         sys.exit('You must provide a system vaults directory.')
     elif not os.path.isdir(args[0]):
         sys.exit('You must provide a system vaults directory.')
+    if not options.masterkeydir:
+        sys.exit('Cannot decrypt anything without master keys.')
+    if not options.system or not options.security:
+        sys.exit('You must provide SYSTEM and SECURITY hives.')
 
 def reverseByte(bByteInput):
     sReversed = ''

@@ -34,21 +34,21 @@ import vaultschema
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
+    if not args or len(args) != 1:
+        sys.exit('You must provide a vaults directory.')
+    elif not os.path.isdir(args[0]):
+        sys.exit('You must provide a vaults directory.')
     if not options.masterkeydir:
         sys.exit('Cannot decrypt anything without master keys.')
     if options.system and options.security:
         return
     if not options.sid:
-        sys.exit('You must provide user SID or os hives!')
+        sys.exit('You must provide user SID or OS hives!')
     if not options.password and not options.pwdhash:
         sys.exit(
             'You must provide the user password or the user password hash. '
             'The user password hash is the SHA1(UTF_LE(password)), and must '
             'be provided as the hex textual string.')
-    if not args or len(args) != 1:
-        sys.exit('You must provide vaults directory.')
-    elif not os.path.isdir(args[0]):
-        sys.exit('You must provide a vaults directory.')
 
 
 def decrypt_blob(mkp, blob):
@@ -105,6 +105,7 @@ if __name__ == '__main__':
         'It tries to decrypt Vault VCRD files.\n'
         'E.g.: Windows\\System32\\config\\systemprofile\\AppData\\Local\\Microsoft\\Vault\\<GUID>\n'
         'or  : %ProgramData%\\Microsoft\\Vault\n'
+        'or  : %localappdata%\\Microsoft\\Vault\n'
         'Can work with user MK *or* system MKs')
 
     parser = optparse.OptionParser(usage=usage)

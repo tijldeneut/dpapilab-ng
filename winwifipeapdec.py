@@ -48,15 +48,14 @@ if __name__ == '__main__':
     """Utility core."""
     usage = (
         'usage: %prog [options] *noargs*\n\n'
-        'It decrypts Windows WiFi Enterprise password stored in '
-        'registry HKCU, which is stored in NTUSER.dat'
-        'wdir is needed for getting the profile name:'
-        '<\\ProgramData\\Microsoft\\WlanSvc\\Profiles> files. '
-        'You must provide such directory, NTUSER.dat, SYSTEM and SECURITY hives and, '
-        'the system DPAPI MasterKeys, stored in '
-        '<\\Windows\\System32\\Microsoft\\Protect\\S-1-5-18\\User>'
-        'but also the user DPAPI MasterKeys, stored in '
-        '<\\<User>\\AppData\\Roaming\\Microsoft\\Protect\\<SID>>'
+        'It decrypts Windows WiFi Enterprise password stored in registry HKCU, which is stored in NTUSER.dat\n'
+        'wdir is needed for getting the profile name:\n'
+        '\\ProgramData\\Microsoft\\WlanSvc\\Profiles files.\n'
+        'You must provide such directory, NTUSER.dat, SYSTEM and SECURITY hives and,\n'
+        'the system DPAPI MasterKeys, stored in\n'
+        '\\Windows\\System32\\Microsoft\\Protect\\S-1-5-18\\User\n'
+        'but also the user DPAPI MasterKeys, stored in\n'
+        '\\<User>\\AppData\\Roaming\\Microsoft\\Protect\\<SID>'
         )
 
     parser = optparse.OptionParser(usage=usage)
