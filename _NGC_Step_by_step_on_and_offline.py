@@ -23,14 +23,14 @@ def parseProtectors(sPath, boolVerbose = False):
         ## name, provider, keyname, timestamp, data
         arrProtector = []
         arrProtector.append(protector)
-        with open(sPath + '\\' + protector + '\\1.dat', 'rb') as f: arrProtector.append(f.read().decode('utf16').strip('\x00'))
+        with open(os.path.join(sPath, protector, '1.dat'), 'rb') as f: arrProtector.append(f.read().decode('utf16').strip('\x00'))
         try:
-            with open(sPath + '\\' + protector + '\\2.dat', 'rb') as f: arrProtector.append(f.read().decode('utf16').strip('\x00'))
+            with open(os.path.join(sPath, protector, '2.dat'), 'rb') as f: arrProtector.append(f.read().decode('utf16').strip('\x00'))
         except:
             arrProtector.append('')
             print('[-] Protector "' + protector + '" is probably being stored in the TPM chip.')
-        with open(sPath + '\\' + protector + '\\9.dat', 'rb') as f: arrProtector.append(parseTimestamp(f.read()))
-        with open(sPath + '\\' + protector + '\\15.dat', 'rb') as f: arrProtector.append(f.read())
+        with open(os.path.join(sPath, protector, '9.dat'), 'rb') as f: arrProtector.append(parseTimestamp(f.read()))
+        with open(os.path.join(sPath, protector, '15.dat'), 'rb') as f: arrProtector.append(f.read())
         arrProtectors.append(arrProtector)
         if boolVerbose:
             print('= ' + arrProtector[0] + ' =')
@@ -46,17 +46,17 @@ def parseItems(sPath, boolVerbose = False):
     arrHeadItems = []
     for sFolder in os.listdir(sPath):
         if not sFolder.startswith('{'): continue
-        if len(os.listdir(sPath + '\\' + sFolder + '\\')) <= 1: continue
+        if len(os.listdir(os.path.join(sPath, sFolder))) <= 1: continue
         arrHeadItems.append(sFolder)
         if boolVerbose: print('= ' + sFolder + ' =')
-        for sSubFolder in os.listdir(sPath + '\\' + sFolder + '\\'):
+        for sSubFolder in os.listdir(os.path.join(sPath, sFolder)):
             if sSubFolder.startswith('{'): continue
             ## filename, name, provider, keyname
             arrSubItems = []
             arrSubItems.append(sSubFolder)
-            with open(sPath + '\\' + sFolder + '\\' + sSubFolder + '\\1.dat', 'rb') as f: arrSubItems.append(f.read().decode('utf16').strip('\x00'))
-            with open(sPath + '\\' + sFolder + '\\' + sSubFolder + '\\2.dat', 'rb') as f: arrSubItems.append(f.read().decode('utf16').strip('\x00'))
-            with open(sPath + '\\' + sFolder + '\\' + sSubFolder + '\\3.dat', 'rb') as f: arrSubItems.append(f.read().decode('utf16').strip('\x00'))
+            with open(os.path.join(sPath, sFolder, sSubFolder, '1.dat'), 'rb') as f: arrSubItems.append(f.read().decode('utf16').strip('\x00'))
+            with open(os.path.join(sPath, sFolder, sSubFolder, '2.dat'), 'rb') as f: arrSubItems.append(f.read().decode('utf16').strip('\x00'))
+            with open(os.path.join(sPath, sFolder, sSubFolder, '3.dat'), 'rb') as f: arrSubItems.append(f.read().decode('utf16').strip('\x00'))
             arrHeadItems.append(arrSubItems)
             if boolVerbose:
                 print('* ' + arrSubItems[0])
@@ -137,19 +137,20 @@ if __name__ == '__main__':
     arrGUIDs = os.listdir(args[0])
     for sGUID in arrGUIDs:
         print('[+] NGC GUID      : ' + sGUID)
-        with open(args[0] + '\\' + sGUID + '\\1.dat', 'rb') as f: sUserSID = f.read().decode('utf16')
+        #os.path.join(args[0], sGUID, 'Protectors')
+        with open(os.path.join(args[0], sGUID, '1.dat'), 'rb') as f: sUserSID = f.read().decode('utf16')
         print('[+] User SID      : ' + sUserSID)
         try: 
-            with open(args[0] + '\\' + sGUID + '\\7.dat', 'rb') as f: sMainProvider = f.read().decode('utf16')
+            with open(os.path.join(args[0], sGUID, '7.dat'), 'rb') as f: sMainProvider = f.read().decode('utf16')
         except: 
             exit('[-] Failed, are you running as System? (not Admin)')
         print('[+] Main Provider : ' + sMainProvider)
 
         print('\n== Protectors ==')
-        arrProtectors = parseProtectors(args[0] + '\\' + sGUID + '\\Protectors\\', True)
+        arrProtectors = parseProtectors(os.path.join(args[0], sGUID, 'Protectors'), True)
 
         print('== Items ==')
-        arrItems = parseItems(args[0] + '\\' + sGUID + '\\', True)
+        arrItems = parseItems(os.path.join(args[0], sGUID), True)
 
         
     ## Getting most interesting data
