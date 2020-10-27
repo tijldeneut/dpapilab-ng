@@ -35,6 +35,8 @@ def check_parameters(options, args):
         sys.exit('You must provide crypto keys directory.')
     if not options.pinguid and (options.pin or options.pinbrute):
         sys.exit('You must provide a pinGUID when trying to decrypt or brute force with PIN (run NGC first).')
+    if options.pinguid and not (options.pin or options.pinbrute):
+        sys.exit('You must provide a PIN or enable the brute force option.')
 
 def reverseByte(sByteInput):
     sReversed = ''
