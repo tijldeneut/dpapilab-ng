@@ -10,7 +10,7 @@ please see "How to Use" and ask questions.
 
 How to install
 --------------
-``pip3 install wheel pytz pycryptodome python-registry construct==2.5.5-reupload``
+``python3 -m pip install wheel pytz pycryptodome python-registry construct==2.5.5-reupload``
 
 The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py)
 pycryptodome (just like pycrypto) on Windows requires a C compiler:
@@ -38,7 +38,7 @@ but, again, every file changed to accomodate for using Python3.
 **blobdec.py**: this utility tries to decrypt a *system* or *user* DPAPI BLOB
 file provided, using DPAPI system key stored in LSA secrets or user password/hash.
 
-**blobdec-with-masterkey.py**: this utility tries to decrypt a DPAPI BLOB when a 
+**blobdec-with-masterkey.py**: this utility tries to decrypt a DPAPI BLOB given an 
 already unlocked MasterKey (hex format) and optionally entropy.
 
 **mkinfo.py**: this small utility simply tries to parse a MasterKey file or a
@@ -47,17 +47,21 @@ directory containing MasterKey files.
 **mksdec.py**: this utility tries to decrypt the *system* MasterKey
 files provided, using DPAPI system key stored in LSA secrets.
 
-**mkudec.py**: this utility tries to unlock (decrypt) the *user* MasterKey 
+**mkudec.py**: this utility tries to decrypt the *user* MasterKey 
 files provided, using the user password or password hash.
 
 **winwifidec.py**: this utility (formerly called wiffy.py) decrypts Windows 
-WiFi password, which are (usually) system wide. To decrypt them you need: the 
+Wi-Fi password, which are (usually) system wide. To decrypt them you need: the 
 DPAPI system key, which is one of the OS LSA secrets; the system MasterKeys, 
 stored in  ``\Windows\System32\Microsoft\Protect\S-1-5-18\User``; the WiFi
 directory, ``\ProgramData\Microsoft\WwanSvc\Profiles``.
 
+**winwifipeapdec.py**: this utility decrypts Windows Wi-Fi Enterprise passwords,
+these are first encrypted using system Masterkeys, but the password itself is in
+``NTUSER.dat`` and encrypted with user Masterkeys, so both are needed.
+
 **chrome-edge-dec.py**: this utility tries to decrypt both Cookies and 
-stored browser passwords from either Chrome or the newer MS Edge browser. 
+stored browser passwords from either Chrome, Opera or the newer MS Edge browser. 
 
 **creddec.py**: this utility tries to decrypt Windows Credential files
 
@@ -65,7 +69,34 @@ stored browser passwords from either Chrome or the newer MS Edge browser.
 
 **vaultdec.py**: this utility tries to decrypt Windows Vault files
 
+**openvpndec.py**: this utility tries to decrypt OpenVPN certificate passphrases
+that are stored in ``NTUSER.dat`` and encrypted with the User MasterKey
+
 The NGC files are accompanied by an article, later more ...
+
+***NGC Usage***
+---------------
+**ngcparse.py**: parses the Windows Ngc folder and files:
+``\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\Ngc``
+On a live system, this requires SYSTEM privileges
+
+**ngcvaultdec.py**: similar to ***vaultdec.py*** but adds a parsing layer
+
+**ngcregistrydec.py**: parses the ``SOFTWARE`` to parse the NgcPin data
+Successful output is ***EncData***, ***IV*** and ***EncPassword***
+
+**ngccryptokeysdec.py**: parses and decrypts the RSA/ECDS keys in
+``\Windows\ServiceProfiles\LocalService\AppData\Roaming\Microsoft\Crypto\Keys``
+using the System MasterKey. Also implements ***ncrypt.dll*** functionality to 
+decrypt the Private Keys using a PIN (***smartCardSecret***) and brute force PINs
+
+**_NGC_Step_by_step_on_and_offline.py**: fully decrypt an encrypted Windows 
+Hello Ngc PIN credential by running the other scripts manually. 
+Use this script to learn to use the other scripts
+
+**_NGC_Full_Auto.py**: tries to fully automatically decrypt Windows Hello Ngc Pins
+by calling the other scripts, only needs a Windows folder. 
+Use this script for a quick win. 
 
 Licensing and Copyright
 -----------------------
