@@ -15,7 +15,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Windows system WiFi password offline and online decryptor."""
+""" Windows system Wi-Fi password offline and online decryptor."""
 
 import optparse, os, re, sys
 
@@ -125,4 +125,4 @@ if __name__ == '__main__':
                                         wblob2.decrypt(mk2.get_key())
                                         if wblob2.decrypted:
                                             wifi_pwd = wblob2.cleartext.rstrip(b'\x00').decode(errors='ignore')
-                print(('[+] Wifi:{}, Username:{}, Domain:{}, Password:{}'.format(wifi_name, wifi_username, wifi_domain, wifi_pwd)))
+                print(('[+] Wi-Fi:{}, Username:{}, Domain:{}, Password:{}'.format(wifi_name, wifi_username, wifi_domain, wifi_pwd)))
