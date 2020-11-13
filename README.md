@@ -18,8 +18,8 @@ Installing permanently:
 ``git clone https://github.com/tijldeneut/dpapilab-ng``  
 ``cd dpapilab-ng``  
 ``sudo python3 -m pip install -r requirements.txt``  
-``rm *.txt *.md LICENSE``  
-``sudo cp -rp * /usr/bin/``
+``chmod +x *.py``  
+``sudo cp -rp *.py /usr/bin/``
 
 ## How to use
 
