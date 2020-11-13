@@ -18,6 +18,14 @@ Get the Build Tools at
 https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019 
 and install "C++ build tools", "Windows 10 SDK" and "MSVC v142 x64/x86 build tools"
 
+Installing permanently:  
+``git clone https://github.com/tijldeneut/dpapilab-ng``  
+``cd dpapilab-ng``  
+``sudo python3 -m pip install -r requirements.txt``  
+``rm *.txt *.md LICENSE``  
+``sudo cp -rp * /usr/bin/``
+
+
 How to use
 ----------
 
