@@ -22,11 +22,11 @@ import optparse, os, sys
 from Crypto.Cipher import AES
 
 try:
-    import dpapick_py3.blob as blob
-    import dpapick_py3.masterkey as masterkey
-    import dpapick_py3.registry as registry
+    import dpapick3.blob as blob
+    import dpapick3.masterkey as masterkey
+    import dpapick3.registry as registry
 except ImportError:
-    raise ImportError('Missing dpapick_py3 folder, get it or set PYTHONPATH.')
+    raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
 import vaultstruct
 import vaultschema

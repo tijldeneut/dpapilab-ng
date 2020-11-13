@@ -1,5 +1,5 @@
-Windows DPAPI-NG lab in Python 3
-=================
+# Windows DPAPI-NG lab in Python 3
+
 Forked from https://github.com/dfirfpi/dpapilab
  with every single file edited and several additions
 
@@ -8,15 +8,11 @@ Windows DPAPI (Data Protection API).
 It's a lab, so something could not work: 
 please see "How to Use" and ask questions.
 
-How to install
---------------
+## How to install
+
 ``python3 -m pip install wheel pytz pycryptodome python-registry construct==2.5.5-reupload``
 
 The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py)
-pycryptodome (just like pycrypto) on Windows requires a C compiler:
-Get the Build Tools at 
-https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019 
-and install "C++ build tools", "Windows 10 SDK" and "MSVC v142 x64/x86 build tools"
 
 Installing permanently:  
 ``git clone https://github.com/tijldeneut/dpapilab-ng``  
@@ -25,9 +21,8 @@ Installing permanently:
 ``rm *.txt *.md LICENSE``  
 ``sudo cp -rp * /usr/bin/``
 
+## How to use
 
-How to use
-----------
 
 Every utility has usually a minimal description that should help its usage.
 Please consider that this is a *laboratory*, so don't expect that everything
@@ -82,8 +77,8 @@ that are stored in ``NTUSER.dat`` and encrypted with the User MasterKey
 
 The NGC files are accompanied by an article, later more ...
 
-***NGC Usage***
----------------
+## ***NGC Usage***
+
 **ngcparse.py**: parses the Windows Ngc folder and files:
 ``\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\Ngc``
 On a live system, this requires SYSTEM privileges
@@ -106,8 +101,7 @@ Use this script to learn to use the other scripts
 by calling the other scripts, only needs a Windows folder. 
 Use this script for a quick win. 
 
-Licensing and Copyright
------------------------
+## Licensing and Copyright
 
 Copyright 2015 Francesco "dfirfpi" Picasso. All Rights Reserved.
 Copyright 2020 Tijl "Photubias" Deneut. All Rights Reserved.
@@ -127,8 +121,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 
-Bugs and Support
-----------------
+## Bugs and Support
 
 There is no support provided with this software. There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR

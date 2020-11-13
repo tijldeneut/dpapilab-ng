@@ -20,9 +20,9 @@
 import optparse, os, sys
 
 try:
-    import dpapick_py3.credhist as credhist
+    import dpapick3.credhist as credhist
 except ImportError:
-    raise ImportError('Missing dpapick_py3 folder, get it or set PYTHONPATH.')
+    raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
 
 def check_parameters(options, args):

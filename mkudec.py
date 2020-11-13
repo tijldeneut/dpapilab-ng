@@ -20,9 +20,9 @@
 import hashlib, optparse, os, sys
 
 try:
-    import dpapick_py3.masterkey as masterkey
+    import dpapick3.masterkey as masterkey
 except ImportError:
-    raise ImportError('[-] Missing dpapick_py3 folder, get it or set PYTHONPATH.')
+    raise ImportError('[-] Missing dpapick3, please install via pip install dpapick3.')
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""

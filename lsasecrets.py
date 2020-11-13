@@ -16,7 +16,7 @@
 ##                                                                         ##
 #############################################################################
 
-import dpapick_py3.registry as registry
+import dpapick3.registry as registry
 import sys
 from datetime import datetime
 from optparse import OptionParser

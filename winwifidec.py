@@ -15,16 +15,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Windows system WiFi password offline and online decryptor."""
+""" Windows system Wi-Fi password offline and online decryptor."""
 
 import optparse, os, re, sys
 
 try:
-    import dpapick_py3.blob as blob
-    import dpapick_py3.masterkey as masterkey
-    import dpapick_py3.registry as registry
+    import dpapick3.blob as blob
+    import dpapick3.masterkey as masterkey
+    import dpapick3.registry as registry
 except ImportError:
-    raise ImportError('Missing dpapick_py3 folder, get it or set PYTHONPATH.')
+    raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""

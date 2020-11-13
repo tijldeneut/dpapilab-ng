@@ -20,11 +20,11 @@
 import optparse, os, re, sys
 
 try:
-    import dpapick_py3.blob as blob
-    import dpapick_py3.masterkey as masterkey
-    import dpapick_py3.registry as registry
+    import dpapick3.blob as blob
+    import dpapick3.masterkey as masterkey
+    import dpapick3.registry as registry
 except ImportError:
-    raise ImportError('Missing dpapick_py3 folder, get it or set PYTHONPATH.')
+    raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     """Utility core."""
     usage = (
         'usage: %prog [options] *noargs*\n\n'
-        'It decrypts Windows WiFi Enterprise password stored in registry HKCU, which is stored in NTUSER.dat\n'
+        'It decrypts Windows Wi-Fi Enterprise password stored in registry HKCU, which is stored in NTUSER.dat\n'
         'wdir is needed for getting the profile name:\n'
         '\\ProgramData\\Microsoft\\WlanSvc\\Profiles files.\n'
         'You must provide such directory, NTUSER.dat, SYSTEM and SECURITY hives and,\n'

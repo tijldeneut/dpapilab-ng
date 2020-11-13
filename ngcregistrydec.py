@@ -84,7 +84,7 @@ if __name__ == '__main__':
     usage = (
         'usage: %prog SOFTWARE_hive\n\n'
         'It tries to decrypt Parse NgcPin from SOFTWARE Registry.\n'
-        'Needs the software hive: \n')
+        'Needs the software hive\n')
 
     parser = optparse.OptionParser(usage=usage)
     #parser.add_option('--software', metavar='HIVE', dest='software')

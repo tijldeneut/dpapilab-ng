@@ -9,7 +9,7 @@
 ## It also supports the newer Edge Chromium built: %localappdata%\Microsoft\Edge\User Data\
 ##  and Opera: %appdata%\Opera Software\Opera Stable\
 
-### Requirements: subdirectory dpapick_py3 and libraries pycryptodome
+### Requirements: subdirectory dpapick3 and libraries pycryptodome
     pip3 install pycryptodomex
 '''
 ### FEATURES
@@ -36,10 +36,10 @@ from Cryptodome.Cipher import AES ## pip install pycryptodomex
 ## The dpapick library relies on M2Crypto, which is hard to install and certain versions give a warning in M2Crypto\X509.py, line 44 ('is not' should be '!='), can be ignored (or updated)
 warnings.filterwarnings("ignore")
 try:
-    import dpapick_py3.blob as blob
-    import dpapick_py3.masterkey as masterkey
+    import dpapick3.blob as blob
+    import dpapick3.masterkey as masterkey
 except ImportError:
-    raise ImportError('Missing dpapick_py3 subdirectory?')
+    raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
     exit(1)
 #### Global Vars
 sLocalStateFile = sLoginDataFile = sCookiesFile = sMasterkey = ''

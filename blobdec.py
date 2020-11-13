@@ -20,11 +20,11 @@
 import optparse, os, sys
 
 try:
-    import dpapick_py3.blob as blob
-    import dpapick_py3.masterkey as masterkey
-    import dpapick_py3.registry as registry
+    import dpapick3.blob as blob
+    import dpapick3.masterkey as masterkey
+    import dpapick3.registry as registry
 except ImportError:
-    raise ImportError('[-] Missing dpapick_py3 folder, get it or set PYTHONPATH.')
+    raise ImportError('[-] Missing dpapick3, please install via pip install dpapick3.')
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
@@ -100,6 +100,8 @@ if __name__ == '__main__':
                 print((blob.cleartext.hex()))
                 print(('-' * 79))
                 print((blob.cleartext))
+                print(('-' * 79))
+                print((blob.cleartext.decode('UTF-16LE',errors='ignore')))
                 print(('-' * 79))
             else:
                 print('[-] Unable to decrypt blob')

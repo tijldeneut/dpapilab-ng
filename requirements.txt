@@ -1,5 +1,4 @@
+dpapick3
 wheel
 pytz
-pycryptodome
-python-registry
 construct==2.5.5-reupload
