@@ -31,8 +31,8 @@ brief description (as the followings) for those utilities that are completed.
 In any case feel free to open a bug or a request. Any contribution is much 
 appreciated.
 
-The dpapick dependency has been added a (required) subfolder,
-this is forked from https://github.com/mis-team/dpapick, 
+The dpapick dependency for Python3 has recently been published,
+this is from https://github.com/mis-team/dpapick, 
 but, again, every file changed to accomodate for using Python3.
 
 **blobinfo.py**: this small utility simply tries to parse a DPAPI BLOB file.
