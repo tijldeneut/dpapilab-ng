@@ -44,8 +44,8 @@ if __name__ == '__main__':
     """Utility core."""
     usage = (
         'usage: %prog [options] BLOB\n\n'
-        'It tries to decrypt a user|system DPAPI encrypted BLOB.'
-        'User blob needs sid and password at least.'
+        'It tries to decrypt a user|system DPAPI encrypted BLOB.\n'
+        'User blob needs sid and password at least.\n'
         'System blob needs system and security at least.')
 
     parser = optparse.OptionParser(usage=usage)

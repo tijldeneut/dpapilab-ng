@@ -63,12 +63,18 @@ if __name__ == '__main__':
     mkp.addSystemCredential(dpapi_system)
 
     for arg in args:
-        for file in os.listdir(arg.replace('*','')):
-            if not os.path.isfile(file): break
-            with open(os.path.join(arg.replace('*',''),file), 'rb') as f:
-                if file == 'Preferred': print('[+] Preffered Key is ' + parseGUID(f.read())[:36])
+        if os.path.isfile(arg):
+            with open(arg,'rb') as f:
                 try: mkp.addMasterKey(f.read())
                 except: pass
+        else:
+            for file in os.listdir(arg.replace('*','')):
+                filepath = os.path.join(arg.replace('*',''),file)
+                if not os.path.isfile(filepath): break
+                with open(filepath, 'rb') as f:
+                    if file == 'Preferred': print('[+] Preffered Key is ' + parseGUID(f.read())[:36])
+                    try: mkp.addMasterKey(f.read())
+                    except: pass
 
     mkp.try_credential_hash(None, None)
 

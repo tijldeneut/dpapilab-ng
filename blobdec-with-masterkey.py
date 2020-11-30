@@ -38,7 +38,7 @@ if __name__ == '__main__':
     """Utility core."""
     usage = (
         'usage: %prog [options] BLOB\n\n'
-        'It tries to decrypt a user|system DPAPI encrypted BLOB.'
+        'It tries to decrypt a user|system DPAPI encrypted BLOB.\n'
         'use mksdec.py or mkudec.py to decrypt the masterkey')
 
     parser = optparse.OptionParser(usage=usage)
