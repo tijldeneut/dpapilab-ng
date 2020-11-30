@@ -64,6 +64,7 @@ if __name__ == '__main__':
 
     for arg in args:
         for file in os.listdir(arg.replace('*','')):
+            if not os.path.isfile(file): break
             with open(os.path.join(arg.replace('*',''),file), 'rb') as f:
                 if file == 'Preferred': print('[+] Preffered Key is ' + parseGUID(f.read())[:36])
                 try: mkp.addMasterKey(f.read())
