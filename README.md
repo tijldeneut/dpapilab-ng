@@ -14,6 +14,8 @@ please see "How to Use" and ask questions.
 
 The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py)
 
+The DPAPI bulk of the work is done by DPAPICK3 (https://pypi.org/project/dpapick3/)
+
 Installing permanently:  
 ``git clone https://github.com/tijldeneut/dpapilab-ng``  
 ``cd dpapilab-ng``  
