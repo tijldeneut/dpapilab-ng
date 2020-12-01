@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser.add_option("--security", metavar="HIVE", dest="security")
     parser.add_option("--secret", metavar="NAME", dest="secret")
     parser.add_option("--hex", default=False, dest="hexencode", action="store_true")
-    parser.add_option("--unicode", default=False, dest="unicode", action="store_true")
+    parser.add_option("--unicode", metavar="BOOL", default=False, dest="unicode", action="store_true")
     #parser.add_option("--hex", default=True, dest="hexencode", action="store_true")
 
     (options, args) = parser.parse_args()
