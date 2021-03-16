@@ -101,7 +101,7 @@ def getDPAPIMasterKey(sGUIDFile, sUserSID, sUserHash):
         print('[+] Success! Decrypted masterkey')
         print('[!] Masterkey for GUID (' + oMasterKey.guid.decode(errors='ignore') + ': \n     ' + sMK.hex())
         return sMK.hex()
-    else: print('[-] Failed, make sure all is correct for GUID ' + oMasterKey.guid)
+    else: print('[-] Failed, make sure all is correct for GUID ' + oMasterKey.guid.decode(errors='ignore'))
     return False
 
 def getBlobMkGuid(sEncryptedChromeKey):
