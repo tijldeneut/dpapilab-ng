@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-'''
+r'''
 ## Shout out: https://github.com/agentzex/chrome_v80_password_grabber & dpapilab (both Python2)
 ## Shout out: https://onedrive.live.com/view.aspx?resid=A352EBC5934F0254!3104&ithint=file%2cxlsx&authkey=!ACGFg7R-U5xkTh4
 
