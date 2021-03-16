@@ -140,7 +140,6 @@ def getChromeKey(sLocalStateFile, sMasterkey = None):
 def decryptChromeString(sData, sChromeKey):
     if sData[:4].hex() == '01000000': ## DPAPI BLOB
         oBlob = getBlobMkGuid(sData)
-        print(sChromeKey)
         return decryptBlob(oBlob, sChromeKey)
     else:
         try: sChromeKey = bytes.fromhex(sChromeKey) ## Key must be RAW bytes, but maybe it already is
