@@ -10,7 +10,7 @@ please see "How to Use" and ask questions.
 
 ## How to install
 
-``python3 -m pip install wheel pytz pycryptodome python-registry construct==2.5.5-reupload``
+``python3 -m pip install wheel pytz pycryptodomex python-registry construct==2.5.5-reupload``
 
 The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py)
 
