@@ -130,7 +130,9 @@ def getChromeKey(sLocalStateFile, sMasterkey = None):
     sMkGuid = oBlob.mkguid
     if sMasterkey:
         sChromeKey = decryptBlob(oBlob, sMasterkey)
-        if sChromeKey == '': print('[-] This DPAPI masterkey does not work to decrypt the Chrome/Edge Key ...')
+        if sChromeKey == '':
+            print('[-] This DPAPI masterkey does not work to decrypt the Chrome/Edge Key ...')
+            return b''
         return sChromeKey.hex()
     else: return None
 
