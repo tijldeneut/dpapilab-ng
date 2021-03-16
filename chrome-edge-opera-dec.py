@@ -107,8 +107,6 @@ def getDPAPIMasterKey(sGUIDFile, sUserSID, sUserHash):
 def getBlobMkGuid(sEncryptedChromeKey):
     global sMasterkey
     oBlob = blob.DPAPIBlob(sEncryptedChromeKey)
-    ## oBlob.provider == guidProvider
-    #print(oBlob)
     print('[+] MasterKey (' + sLocalStateFile + ') has GUID: ' + oBlob.mkguid)
     if not sMasterkey: print('[!] Go and find this file and accompanying SID + SHA1 Hash')
     return oBlob
@@ -116,7 +114,7 @@ def getBlobMkGuid(sEncryptedChromeKey):
 def decryptBlob(oBlob, sMasterKey):
     if isinstance(sMasterKey, bytes): sMasterKey = sMasterKey.decode(errors='ignore')
     if oBlob.decrypt(bytes.fromhex(sMasterKey)): return oBlob.cleartext
-    return ''
+    return b''
 
 def getChromeKey(sLocalStateFile, sMasterkey = None):
     try:
@@ -138,9 +136,10 @@ def getChromeKey(sLocalStateFile, sMasterkey = None):
     else: return None
 
 def decryptChromeString(sData, sChromeKey):
+    global sMasterkey
     if sData[:4].hex() == '01000000': ## DPAPI BLOB
         oBlob = getBlobMkGuid(sData)
-        return decryptBlob(oBlob, sChromeKey)
+        if sMasterkey: return decryptBlob(oBlob, sMasterkey).decode()
     else:
         try: sChromeKey = bytes.fromhex(sChromeKey) ## Key must be RAW bytes, but maybe it already is
         except: pass
@@ -190,7 +189,7 @@ def showLoginData(sLoginDataFile, sChromeKey = None):
             if sChromeKey: print('Password:  {}'.format(decryptChromeString(arrData[2], sChromeKey)))
             print('*' * 50 + '\n')
     except Exception as e:
-        #print(e)
+        print(e)
         print('[-] Reading failed, is ' + sLoginDataFile + ' a Chrome Login Data file (that\'s not in use)?')
     oCursor.close()
     oConn.close()
