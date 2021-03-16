@@ -114,7 +114,8 @@ def getBlobMkGuid(sEncryptedChromeKey):
     return oBlob
 
 def decryptBlob(oBlob, sMasterKey):
-    if oBlob.decrypt(bytes.fromhex(sMasterKey.decode(errors='ignore'))): return oBlob.cleartext
+    if isinstance(sMasterKey, bytes): sMasterKey = sMasterKey.decode(errors='ignore')
+    if oBlob.decrypt(bytes.fromhex(sMasterKey)): return oBlob.cleartext
     return ''
 
 def getChromeKey(sLocalStateFile, sMasterkey = None):
@@ -137,19 +138,24 @@ def getChromeKey(sLocalStateFile, sMasterkey = None):
     else: return None
 
 def decryptChromeString(sData, sChromeKey):
-    try: sChromeKey = bytes.fromhex(sChromeKey) ## Key must be RAW bytes, but maybe it already is
-    except: pass
-    try:
-        sIV = sData[3:15]
-        sPayload = sData[15:]
-        cipher = AES.new(sChromeKey, AES.MODE_GCM, sIV)
-        sDecryptedString = cipher.decrypt(sPayload)
-        sDecryptedString = sDecryptedString[:-16].decode(errors='ignore')
-        return sDecryptedString
-    except Exception as e:
-        # print("Probably saved password from Chrome version older than v80\n")
-        print(str(e))
-        return 'Chrome < 80 or domain cred'
+    if sData[:4].hex() == '01000000': ## DPAPI BLOB
+        oBlob = getBlobMkGuid(sData)
+        print(sChromeKey)
+        return decryptBlob(oBlob, sChromeKey)
+    else:
+        try: sChromeKey = bytes.fromhex(sChromeKey) ## Key must be RAW bytes, but maybe it already is
+        except: pass
+        try:
+            sIV = sData[3:15]
+            sPayload = sData[15:]
+            cipher = AES.new(sChromeKey, AES.MODE_GCM, sIV)
+            sDecryptedString = cipher.decrypt(sPayload)
+            sDecryptedString = sDecryptedString[:-16].decode(errors='ignore')
+            return sDecryptedString
+        except Exception as e:
+            # print("Probably saved password from Chrome version older than v80\n")
+            #print(str(e))
+            return 'Chrome < 80 or domain cred'
 
 def decryptCookies(sCookiesFile, sChromeKey):
     oConn = sqlite3.connect(sCookiesFile)
@@ -174,7 +180,7 @@ def decryptCookies(sCookiesFile, sChromeKey):
     oCursor.close()
     oConn.close()
 
-def decryptLoginData(sLoginDataFile, sChromeKey):
+def showLoginData(sLoginDataFile, sChromeKey = None):
     oConn = sqlite3.connect(sLoginDataFile)
     oCursor = oConn.cursor()
     try:
@@ -182,7 +188,7 @@ def decryptLoginData(sLoginDataFile, sChromeKey):
         for arrData in oCursor.fetchall():
             print('URL:       {}'.format(arrData[0]))
             print('User Name: {}'.format(arrData[1]))
-            print('Password:  {}'.format(decryptChromeString(arrData[2], sChromeKey)))
+            if sChromeKey: print('Password:  {}'.format(decryptChromeString(arrData[2], sChromeKey)))
             print('*' * 50 + '\n')
     except Exception as e:
         #print(e)
@@ -198,14 +204,15 @@ if __name__ == '__main__':
         sMasterkey = getDPAPIMasterKey(sGUIDFile, sUserSID, sUserHash)
 
     sChromeAESKey = getChromeKey(sLocalStateFile, sMasterkey.encode())
-    if not sChromeAESKey: exit(1)
+    #if not sChromeAESKey: exit(1)
+    #if not sChromeAESKey: sChromeAESKey = None
 
-    print('[+] Got Chrome/Edge Encryption Key: ' + sChromeAESKey)
+    if sChromeAESKey: print('[+] Got Chrome/Edge Encryption Key: ' + sChromeAESKey)
     print('*' * 50)
     
     if sLoginDataFile:
-        print('[!] Trying to decrypt the Login Data from file ' + sLoginDataFile)
-        decryptLoginData(sLoginDataFile, sChromeAESKey)
+        print('[!] Showing the Login Data from file ' + sLoginDataFile)
+        showLoginData(sLoginDataFile, sChromeAESKey)
     if sCookiesFile:
         print('[!] Trying to decrypt the Cookies from file ' + sCookiesFile)
         decryptCookies(sCookiesFile, sChromeAESKey)
