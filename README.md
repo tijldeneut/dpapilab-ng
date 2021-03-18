@@ -9,18 +9,26 @@ It's a lab, so something could not work:
 please see "How to Use" and ask questions.
 
 ## How to install
-
-``python3 -m pip install wheel pytz pycryptodomex python-registry construct==2.5.5-reupload``
+Prerequisites:  
+```
+sudo apt update && sudo apt install -y python3-pip git  
+python3 -m pip install wheel pytz pycryptodomex python-registry construct==2.5.5-reupload
+```
 
 The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py)
 
 The DPAPI bulk of the work is done by DPAPICK3 (https://pypi.org/project/dpapick3/)
 
 Installing permanently:  
-``git clone https://github.com/tijldeneut/dpapilab-ng``  
-``cd dpapilab-ng``  
-``sudo python3 -m pip install -r requirements.txt``  
-``sudo cp -rp *.py /usr/bin/``
+```
+git clone https://github.com/tijldeneut/dpapilab-ng  
+cd dpapilab-ng  
+sudo python3 -m pip install -r requirements.txt  
+sudo cp -rp *.py /usr/bin/
+```
+
+Oneliner:
+``python3 -m pip install wheel pytz pycryptodomex python-registry construct==2.5.5-reupload && git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
 
 ## How to use
 
