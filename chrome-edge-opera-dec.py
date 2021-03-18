@@ -33,30 +33,31 @@ r'''
 
 import argparse, os, json, base64, sqlite3, time, hashlib, warnings
 from Cryptodome.Cipher import AES ## pip install pycryptodomex
-## The dpapick library relies on M2Crypto, which is hard to install and certain versions give a warning in M2Crypto\X509.py, line 44 ('is not' should be '!='), can be ignored (or updated)
 warnings.filterwarnings("ignore")
 try:
     import dpapick3.blob as blob
     import dpapick3.masterkey as masterkey
 except ImportError:
-    raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
+    raise ImportError('Missing dpapick3, please install via pip install dpapick3')
     exit(1)
 #### Global Vars
 sLocalStateFile = sLoginDataFile = sCookiesFile = sMasterkey = ''
-sGUIDFile = sUserSID = sUserHash = sUserPass = None
+sGUIDFile = sUserSID = sUserHash = sUserPass = arrMasterkeys = None
+setGUIDs = set([])
 
 def parseArgs():
-    global sLocalStateFile, sLoginDataFile, sCookiesFile, sMasterkey, sGUIDFile, sUserSID, sUserHash
+    global sLocalStateFile, sLoginDataFile, sCookiesFile, sMasterkey, sGUIDFile, sUserSID, sUserHash, arrMasterkeys
     
-    print('[!] Welcome. To decrypt, one of three combo\'s is required: \n'
-          'Master Key (alone) / GUID file, SID and User Hash / GUID file, SID and User Password\n'
+    print('[!] Welcome. To decrypt, one of four combo\'s is required: \n'
+          'Masterkey (alone) / file containing Masterkeys / GUID file, SID and User Hash / GUID file, SID and User Password\n'
           'Browser data can be found here:\n'
           '%localappdata%\\Google\\Chrome\\User Data\\Local State')
     oParser = argparse.ArgumentParser()
     oParser.add_argument('-l', metavar='FILE', help='Path to Chrome/Edge Local State file', default='Local State')
     oParser.add_argument('-d', metavar='FILE', help='Path to Chrome/Edge Login Data file (optional)')
     oParser.add_argument('-c', metavar='FILE', help='Path to Chrome/Edge Cookies file (optional)')
-    oParser.add_argument('-m', metavar='HEX', help='Specify Master Key, format 128 HEX Characters (optional)')
+    oParser.add_argument('-m', metavar='HEX', help='Specify Masterkey, format 128 HEX Characters (optional)')
+    oParser.add_argument('-f', metavar='FILE', help='Specify file holding multiple Masterkeys (optional)')
     oParser.add_argument('-g', metavar='FILE', help='Specify GUID file to get Master Key from (as found in Local State, optional)')
     oParser.add_argument('-s', metavar='SID', help='Specify user SID, found in lsassdump and corresponding to GUID, e.g. S-1-5-21-7375663-6890924511-1272660413-2944159-1001 (optional)')
     oParser.add_argument('-a', metavar='HASH', help='Specify user password SHA1 hash (NTLM a no go), e.g. da39a3ee5e6b4b0d3255bfef95601890afd80709 (optional)')
@@ -66,6 +67,9 @@ def parseArgs():
     else: exit('[-] Fatal, which Local State file to use please?')
     if oArgs.d and os.path.isfile(oArgs.d): sLoginDataFile = oArgs.d
     if oArgs.c and os.path.isfile(oArgs.c): sCookiesFile = oArgs.c
+    if oArgs.f:
+        arrMasterkeys = open(oArgs.f,'r').read().splitlines()
+        return
     if oArgs.m:
         sMasterkey = oArgs.m
         return
@@ -99,16 +103,17 @@ def getDPAPIMasterKey(sGUIDFile, sUserSID, sUserHash):
     if oMasterKey.decrypted:
         sMK = oMasterKey.get_key()
         print('[+] Success! Decrypted masterkey')
-        print('[!] Masterkey for GUID (' + oMasterKey.guid.decode(errors='ignore') + ': \n     ' + sMK.hex())
+        print('[!] Masterkey for GUID ' + oMasterKey.guid.decode(errors='ignore') + ': \n     ' + sMK.hex())
         return sMK.hex()
     else: print('[-] Failed, make sure all is correct for GUID ' + oMasterKey.guid.decode(errors='ignore'))
     return False
 
 def getBlobMkGuid(sEncryptedChromeKey):
-    global sMasterkey
+    global sMasterkey, arrMasterkeys, setGUIDs
     oBlob = blob.DPAPIBlob(sEncryptedChromeKey)
     print('[+] MasterKey (' + sLocalStateFile + ') has GUID: ' + oBlob.mkguid)
-    if not sMasterkey: print('[!] Go and find this file and accompanying SID + SHA1 Hash')
+    setGUIDs.add(oBlob.mkguid)
+    if not sMasterkey and not arrMasterkeys: print('[!] Go and find this file and accompanying SID + SHA1 Hash')
     return oBlob
 
 def decryptBlob(oBlob, sMasterKey):
@@ -117,6 +122,7 @@ def decryptBlob(oBlob, sMasterKey):
     return b''
 
 def getChromeKey(sLocalStateFile, sMasterkey = None):
+    global arrMasterkeys
     try:
         with open(sLocalStateFile, 'r') as oFile: lLocalState = json.loads(oFile.read())
         oFile.close()
@@ -133,13 +139,20 @@ def getChromeKey(sLocalStateFile, sMasterkey = None):
             print('[-] This DPAPI masterkey does not work to decrypt the Chrome/Edge Key ...')
             return b''
         return sChromeKey.hex()
+    elif arrMasterkeys:
+        for mk in arrMasterkeys:
+            sChromeKey = decryptBlob(oBlob, mk)
+            if sChromeKey: return sChromeKey.hex()
     else: return None
 
 def decryptChromeString(sData, sChromeKey):
-    global sMasterkey
+    global sMasterkey, arrMasterkeys
     if sData[:4].hex() == '01000000': ## DPAPI BLOB
         oBlob = getBlobMkGuid(sData)
         if sMasterkey: return decryptBlob(oBlob, sMasterkey).decode()
+        if arrMasterkeys:
+            for mk in arrMasterkeys:
+                if not decryptBlob(oBlob, mk).decode() == '': return decryptBlob(oBlob, mk).decode()
     else:
         try: sChromeKey = bytes.fromhex(sChromeKey) ## Key must be RAW bytes, but maybe it already is
         except: pass
@@ -172,31 +185,42 @@ def decryptCookies(sCookiesFile, sChromeKey):
             ## Chrome timestamp is "amount of microseconds since 01-01-1601", so let's do math
             print('Created:  {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(arrData[6] / 1000000 - 11644473600))))
             print('Expires:  {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(arrData[7] / 1000000 - 11644473600))))
-            print('*' * 50 + '\n')
+            print('*' * 50)
     except Exception as e:
         print('[-] Reading failed, is ' + sCookiesFile + ' a Chrome/Edge Cookies file (that\'s not in use)?')
     oCursor.close()
     oConn.close()
 
 def showLoginData(sLoginDataFile, sChromeKey = None):
+    global sMasterkey, setGUIDs, arrMasterkeys
     oConn = sqlite3.connect(sLoginDataFile)
     oCursor = oConn.cursor()
     try:
         oCursor.execute('SELECT action_url, username_value, password_value FROM logins')
+        iCount = 0
+        iDecrypted = 0
         for arrData in oCursor.fetchall():
+            iCount += 1
             print('URL:       {}'.format(arrData[0]))
             print('User Name: {}'.format(arrData[1]))
-            if sChromeKey: print('Password:  {}'.format(decryptChromeString(arrData[2], sChromeKey)))
-            print('*' * 50 + '\n')
+            if sChromeKey or sMasterkey or arrMasterkeys:
+                sDecrypted = decryptChromeString(arrData[2], sChromeKey)
+                print('Password:  {}'.format(sDecrypted))
+                if not sDecrypted == '' and not sDecrypted == 'Chrome < 80 or domain cred': iDecrypted += 1
+            print('*' * 50)
     except Exception as e:
         print(e)
         print('[-] Reading failed, is ' + sLoginDataFile + ' a Chrome Login Data file (that\'s not in use)?')
+    print('[+] Decrypted: ' + str(iDecrypted) + '/' + str(iCount))
+    if len(setGUIDs) > 1:
+        print('[+] GUIDs in this file:')
+        for sGuid in setGUIDs: print('     - ' + sGuid)
     oCursor.close()
     oConn.close()
 
 if __name__ == '__main__':
     parseArgs()
-   
+    
     if sMasterkey == '' and sGUIDFile and sUserSID and sUserHash:
         print('[!] Trying to decrypt the DPAPI Masterkey from file ' + sGUIDFile)
         sMasterkey = getDPAPIMasterKey(sGUIDFile, sUserSID, sUserHash)
