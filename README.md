@@ -27,8 +27,11 @@ sudo python3 -m pip install -r requirements.txt
 sudo cp -rp *.py /usr/bin/
 ```
 
-Oneliner:  
+Oneliner (Kali):  
 ``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt --use-deprecated=legacy-resolver && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
+
+Oneliner (Linux & Windows):  
+``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
 
 ## How to use
 
