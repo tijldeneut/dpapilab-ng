@@ -28,7 +28,7 @@ sudo cp -rp *.py /usr/bin/
 ```
 
 Oneliner:  
-``python3 -m pip install wheel pytz pycryptodomex python-registry construct==2.5.5-reupload && git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
+``python3 -m pip install wheel pytz pycryptodomex python-registry && git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
 
 ## How to use
 
