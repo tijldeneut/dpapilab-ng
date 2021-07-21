@@ -1,6 +1,5 @@
 dpapick3
 wheel
 pytz
-## Construct v2.5.5 is needed for 2 python files (vaultdec & creddec) but is deprecated unless installed with the --use-deprecated=legacy-resolver option
-#construct; sys_platform == 'win32'
-construct==2.5.5-reupload
+## Construct v2.5.5 is needed for two python files (vaultdec & creddec) although deprecated (todo)
+construct-2.5.5-reupload.tar.gz
