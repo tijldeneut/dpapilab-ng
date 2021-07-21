@@ -161,11 +161,14 @@ if __name__ == '__main__':
         
     ## Getting most interesting data
     bInputData = b''
+    boolTPM = False
     sGUID1 = arrGUIDs[0] ## NGC GUID
     for arrProtector in arrProtectors:
         if arrProtector[1] == 'Microsoft Software Key Storage Provider': 
             sGUID1 = arrProtector[2]
             bInputData = arrProtector[4]
+        elif arrProtector[1] == 'Microsoft Platform Crypto Provider':
+            boolTPM = True
     print('[+] Got InputData: ' + bInputData.hex())
     for arrItem in arrItems:
         if arrItem[1] == '//9DDC52DB-DC02-4A8C-B892-38DEF4FA748F': sGUID2 = arrItem[3]
