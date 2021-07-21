@@ -40,8 +40,9 @@ def check_parameters(options, args):
     if not options.password and not options.pwdhash and not options.system:
         sys.exit(
             'You must provide the user password or the user password hash. '
-            'The user password hash is the SHA1(UTF_LE(password)), and must '
-            'be provided as the hex textual string.')
+            'The user password hash is SHA1(UTF_LE(password)), and must '
+            'be provided as the hex textual string.\n'
+            'If there\'s no password, use pwdhash "da39a3ee5e6b4b0d3255bfef95601890afd80709"')
     if options.sysmkdir and (not options.system or not options.security):
         sys.exit('You must provide SYSTEM and SECURITY hives')
     if not args:
@@ -135,51 +136,54 @@ if __name__ == '__main__':
         smkp.try_credential_hash(None, None)
         can_decrypt_sys_blob = True
 
-    for cred_file in args:
-        with open(cred_file, 'rb') as fin:
-            print(('-'*79))
-
-            enc_cred = vaultstruct.CREDENTIAL_FILE.parse(fin.read())
-
-            cred_blob = blob.DPAPIBlob(enc_cred.data.raw)
-            #print(cred_blob)
-
-            if umkp:
-                dec_cred, res_err = decrypt_blob(umkp, cred_blob)
-            elif smkp:
-                dec_cred, res_err = decrypt_blob(smkp, cred_blob)
-            else:
-                sys.exit('No MasterKey pools available!')
-
-            if not dec_cred:
-                helper_dec_err(res_err)
-                continue                 
-
-            try: cred_dec = vaultstruct.CREDENTIAL_DECRYPTED.parse(dec_cred)
-            except: break
-            print(cred_dec)
-            if cred_dec.header.unk_type == 3:
-                print(cred_dec.header)
-                print(cred_dec.main)
-
-            elif cred_dec.header.unk_type == 2:
-                if smkp:
-                    cred_block_dec = decrypt_credential_block(smkp, cred_dec)
-                    if not cred_block_dec:
-                        print(cred_dec)
-                        print('Unable to decrypt CRED BLOCK.', file=sys.stderr)
-                    else:
-                        print(cred_dec.header)
-                        print(cred_dec.main)
-                        print(('-'*40))
-                        print(cred_block_dec)
+    for cred_path in args:
+        for cred_file in os.listdir(cred_path.replace('*','')):
+            with open(os.path.join(cred_path.replace('*',''),cred_file), 'rb') as fin:
+                print(('-'*79))
+                print(('-'*5)+' File: '+cred_file+' '+('-'*5))
+                
+                enc_cred = vaultstruct.CREDENTIAL_FILE.parse(fin.read())
+    
+                cred_blob = blob.DPAPIBlob(enc_cred.data.raw)
+                #print(cred_blob)
+    
+                if umkp:
+                    dec_cred, res_err = decrypt_blob(umkp, cred_blob)
+                elif smkp:
+                    dec_cred, res_err = decrypt_blob(smkp, cred_blob)
                 else:
-                    print(cred_dec)
-                    print('[-] Missing system MasterKeys info!', file=sys.stderr)
-                    print('[-] Unable to decrypt further blocks!', file=sys.stderr)
-
-            else:
-                print('[-] Unknown CREDENTIAL type, please report.', file=sys.stderr)
+                    sys.exit('No MasterKey pools available!')
+    
+                if not dec_cred:
+                    helper_dec_err(res_err)
+                    continue                 
+    
+                try: cred_dec = vaultstruct.CREDENTIAL_DECRYPTED.parse(dec_cred)
+                except: break
                 print(cred_dec)
+                if cred_dec.header.unk_type == 3:
+                    print(cred_dec.header)
+                    print(cred_dec.main)
+    
+                elif cred_dec.header.unk_type == 2:
+                    if smkp:
+                        try: cred_block_dec = decrypt_credential_block(smkp, cred_dec)
+                        except: continue
+                        if not cred_block_dec:
+                            print(cred_dec)
+                            print('Unable to decrypt CRED BLOCK.', file=sys.stderr)
+                        else:
+                            print(cred_dec.header)
+                            print(cred_dec.main)
+                            print(('-'*40))
+                            print(cred_block_dec)
+                    else:
+                        print(cred_dec)
+                        print('[-] Missing system MasterKeys info!', file=sys.stderr)
+                        print('[-] Unable to decrypt further blocks!', file=sys.stderr)
+    
+                else:
+                    print('[-] Unknown CREDENTIAL type, please report.', file=sys.stderr)
+                    print(cred_dec)
 
-        print(('-'*79))
+        #print(('-'*79))
