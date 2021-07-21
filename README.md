@@ -23,14 +23,11 @@ Installing permanently (Linux):
 ```
 git clone https://github.com/tijldeneut/dpapilab-ng  
 cd dpapilab-ng  
-sudo python3 -m pip install -r requirements.txt #--use-deprecated=legacy-resolver 
+sudo python3 -m pip install -r requirements.txt
 sudo cp -rp *.py /usr/bin/
 ```
 
-Oneliner (newer versions):  
-``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt --use-deprecated=legacy-resolver && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
-
-Oneliner (older versions):  
+Oneliner:  
 ``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
 
 ## How to use
@@ -89,7 +86,7 @@ that are stored in ``NTUSER.dat`` and encrypted with the User MasterKey
 
 The NGC files are accompanied by an article, later more ...
 
-## ***NGC Usage***
+## NGC Usage
 
 **ngcparse.py**: parses the Windows Ngc folder and files:
 ``\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\Ngc``
