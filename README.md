@@ -12,25 +12,25 @@ please see "How to Use" and ask questions.
 Prerequisites:  
 ```
 sudo apt update && sudo apt install -y python3-pip git  
-python3 -m pip install wheel pytz pycryptodomex python-registry construct==2.5.5-reupload
+python3 -m pip install wheel pytz pycryptodomex python-registry construct==2.5.5-reupload #--use-deprecated=legacy-resolver
 ```
 
-The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py)
+The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py) and on Windows requires the `--use-deprecated=legacy-resolver` option
 
 The DPAPI bulk of the work is done by DPAPICK3 (https://pypi.org/project/dpapick3/)
 
-Installing permanently:  
+Installing permanently (Linux):  
 ```
 git clone https://github.com/tijldeneut/dpapilab-ng  
 cd dpapilab-ng  
-sudo python3 -m pip install -r requirements.txt  
+sudo python3 -m pip install -r requirements.txt #--use-deprecated=legacy-resolver 
 sudo cp -rp *.py /usr/bin/
 ```
 
-Oneliner (Kali):  
+Oneliner (newer versions):  
 ``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt --use-deprecated=legacy-resolver && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
 
-Oneliner (Linux & Windows):  
+Oneliner (older versions):  
 ``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && rm -rf dpapilab-ng``
 
 ## How to use
