@@ -3,9 +3,9 @@
 Forked from https://github.com/dfirfpi/dpapilab
  with every single file edited and several additions
 
-Here I want to put some ongoing works that involve 
+Here I want to put some ongoing work that involve 
 Windows DPAPI (Data Protection API). 
-It's a lab, so something could not work: 
+It's a lab, so something may not work: 
 please see "How to Use" and ask questions.
 
 ## How to install
@@ -27,10 +27,8 @@ sudo python3 -m pip install -r requirements.txt
 sudo cp -rp *.py /usr/bin/
 ```
 
-Oneliner:  
-```
-git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && sudo rm -rf dpapilab-ng
-```
+Oneliner for Linux:  
+``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && sudo rm -rf dpapilab-ng``
 
 ## How to use
 
@@ -53,7 +51,7 @@ but, again, every file changed to accomodate for using Python3.
 file provided, using DPAPI system key stored in LSA secrets or user password/hash.
 
 **blobdec-with-masterkey.py**: this utility tries to decrypt a DPAPI BLOB given an 
-already unlocked MasterKey (hex format) and optionally entropy.
+already unlocked MasterKey (hex format) and an optional entropy.
 
 **mkinfo.py**: this small utility simply tries to parse a MasterKey file or a
 directory containing MasterKey files.
@@ -62,7 +60,7 @@ directory containing MasterKey files.
 files provided, using DPAPI system key stored in LSA secrets.
 
 **mkudec.py**: this utility tries to decrypt the *user* MasterKey 
-files provided, using the user password or password hash.
+files provided, using the user password, password hash or Domain PVK file.
 
 **winwifidec.py**: this utility (formerly called wiffy.py) decrypts Windows 
 Wi-Fi password, which are (usually) system wide. To decrypt them you need: the 
@@ -74,8 +72,9 @@ directory, ``\ProgramData\Microsoft\WwanSvc\Profiles``.
 these are first encrypted using system Masterkeys, but the password itself is in
 ``NTUSER.dat`` and encrypted with user Masterkeys, so both are needed.
 
-**chrome-edge-dec.py**: this utility tries to decrypt both Cookies and 
+**browserdec.py**: this utility tries to decrypt both cookies and 
 stored browser passwords from either Chrome, Opera or the newer MS Edge browser. 
+Using many different ways (masterkeys, SHA1/NT hashes or AD PVK file) 
 
 **creddec.py**: this utility tries to decrypt Windows Credential files
 
@@ -86,7 +85,8 @@ stored browser passwords from either Chrome, Opera or the newer MS Edge browser.
 **openvpndec.py**: this utility tries to decrypt OpenVPN certificate passphrases
 that are stored in ``NTUSER.dat`` and encrypted with the User MasterKey
 
-The NGC files are accompanied by an article, later more ...
+The NGC files are accompanied by an article, read it here: 
+https://www.insecurity.be/blog/2020/12/24/dpapi-in-depth-with-tooling-standalone-dpapi/
 
 ## NGC Usage
 
@@ -104,13 +104,13 @@ Successful output is ***EncData***, ***IV*** and ***EncPassword***
 using the System MasterKey. Also implements ***ncrypt.dll*** functionality to 
 decrypt the Private Keys using a PIN (***smartCardSecret***) and brute force PINs
 
-**_NGC_Step_by_step_on_and_offline.py**: fully decrypt an encrypted Windows 
+**_ngc_step_by_step_on_and_offline.py**: fully decrypt an encrypted Windows 
 Hello Ngc PIN credential by running the other scripts manually. 
-Use this script to learn to use the other scripts
+Use this script to learn to use the other scripts, requires other scripts
 
-**_NGC_Full_Auto.py**: tries to fully automatically decrypt Windows Hello Ngc Pins
+**_ngc_full_auto.py**: tries to fully automatically decrypt Windows Hello Ngc Pins
 by calling the other scripts, only needs a Windows folder. 
-Use this script for a quick win. 
+Use this script for a quick win, requires other scripts
 
 ## Licensing and Copyright
 
