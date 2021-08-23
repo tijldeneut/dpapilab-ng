@@ -267,7 +267,8 @@ def main(sVaultFolder, sMasterkey, sSystem, sSecurity, sSoftware = None, boolOut
     bKeyAES128, bKeyAES256 = parsePolicyEntries(vpol_cleartext)
     
     ## Step 3: Parse and AES decrypt VCRD
-    bDecrypted = b''
+    sUsername = ''
+    arrResult = []
     for xfile in os.listdir(sVaultFolder):
         if xfile.lower().endswith('.vcrd'):
             filepath = os.path.join(sVaultFolder, xfile)
@@ -285,8 +286,6 @@ def main(sVaultFolder, sMasterkey, sSystem, sSecurity, sSoftware = None, boolOut
                         if sSoftware: 
                             sUsername = getUsername(sSoftware, parseSID(dicContainers[2]))
                             if boolOutput: print('[+] Username    : ' + sUsername)
-                        else:
-                            sUsername = ''
                         arrResult = parseFinalData(dicContainers[3], boolOutput) ## Also found in the registry with reg query HKLM\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\NgcPin\Credentials\S-1-5-21-1493826120-1374394018-1204472284-1001 /v EncryptedPassword
                     else:
                         if boolOutput:
@@ -295,6 +294,7 @@ def main(sVaultFolder, sMasterkey, sSystem, sSecurity, sSoftware = None, boolOut
                             try: print('[+] Decoded value      : ' + dicContainers[3].decode('utf-16le',errors='ignore'))
                             except: pass
             if boolOutput: print('#'*50)
+    if arrResult == []: print('[-] No vaults found')
     return (sUsername, arrResult)
 
 if __name__ == '__main__':

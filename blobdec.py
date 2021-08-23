@@ -55,7 +55,7 @@ if __name__ == '__main__':
     parser.add_option('--sid', metavar='SID', dest='sid')
     parser.add_option('--credhist', metavar='FILE', dest='credhist')
     parser.add_option('--password', metavar='PASSWORD', dest='password')
-    parser.add_option('--pwdhash', metavar='HASH', dest='pwdhash')
+    parser.add_option('--pwdhash', metavar='HASH', dest='pwdhash', help='Example for empth hash: da39a3ee5e6b4b0d3255bfef95601890afd80709')
     parser.add_option('--entropy_hex', metavar='HIVE', dest='entropy_hex')
 
     (options, args) = parser.parse_args()
