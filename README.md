@@ -28,7 +28,9 @@ sudo cp -rp *.py /usr/bin/
 ```
 
 Oneliner for Linux:  
-``git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && sudo rm -rf dpapilab-ng``
+```
+git clone https://github.com/tijldeneut/dpapilab-ng && cd dpapilab-ng && sudo python3 -m pip install -r requirements.txt && sudo cp -rp *.py /usr/bin/ && cd .. && sudo rm -rf dpapilab-ng
+```
 
 ## How to use
 
