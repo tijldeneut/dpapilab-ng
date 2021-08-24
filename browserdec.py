@@ -289,3 +289,5 @@ if __name__ == '__main__':
     if bBrowserBMEKey and lstCookies:
         iDecrypted = decryptCookies(lstCookies, bBrowserBMEKey, lstMasterkeys, oArgs.export, oArgs.verbose)
         print('Decrypted {} / {} cookies'.format(str(iDecrypted), str(len(lstCookies))))
+    
+    if not oArgs.verbose and bBrowserBMEKey: print('[!] To print the results to terminal, rerun with "-v"')
