@@ -208,7 +208,7 @@ if __name__ == '__main__':
     sEncPassword = input('[?] EncPassword : ')
     bEncKey = bytes.fromhex(sEncKey)
     bClearText = cipher.decrypt(bEncKey,b'')
-    print(bClearText.hex())
+    #print(bClearText.hex())
     bIV = bytes.fromhex(sIV)
     bEncPassword = bytes.fromhex(sEncPassword)
     from Crypto.Cipher import AES
