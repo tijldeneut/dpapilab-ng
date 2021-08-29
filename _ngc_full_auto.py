@@ -174,12 +174,12 @@ if __name__ == '__main__':
     try: 
         sRSAKEY1 = ngccryptokeysdec.main(sCryptoFolder, sSystemMasterKeyFolder, sSYSTEMHive, sSECURITYHive, sPIN, sGUID1, False).hex()
     except: 
-        exit('[-] Error: Key most probably in TPM?')
+        exit('[-] Error: PIN wrong or key in TPM?')
     oRSAKEY1 = constructRSAKEY(sRSAKEY1)
     oCipher1 = PKCS1_v1_5.new(oRSAKEY1)
     
     ## STEP3b: Use RSA KEY to decrypt the NGC Input Data
-    try: bDecrRSAData1 = oCipher1.decrypt(bRSAData1,b'')
+    try: bDecrRSAData1 = oCipher1.decrypt(bRSAData1, b'')
     except: exit('[-] Error decrypting the inputdata')
     sDecryptPin = parseDecryptPin(bDecrRSAData1).hex() ## Add "verbose=True" to get Decr PIN, Sign PIN and Unk PIN
     print('[!] Trying to decrypt user password')
