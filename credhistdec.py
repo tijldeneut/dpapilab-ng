@@ -52,6 +52,6 @@ if __name__ == '__main__':
     if len(cred.entries_list) == 0: sys.exit('[-] No entries in this CREDHIST file')
     if options.pwdhash:  cred.decryptWithHash(bytes.fromhex(options.pwdhash))
     elif options.password: cred.decryptWithPassword(options.password)
-    if ('NTLM' in str(s) for s in cred.entries_list): print('[+] CREDHIST decrypted')
-    else: print('[-] Unable to decrypt CREDHIST')
+    for s in cred.entries_list:
+        if s.ntlm: print('[+] CREDHIST decrypted')
     print(cred)
