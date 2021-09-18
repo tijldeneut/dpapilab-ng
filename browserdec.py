@@ -37,7 +37,7 @@ except ImportError:
 
 def parseArgs():
     print('[!] Welcome. To decrypt, one of four combo\'s is required: \n'
-          'Decrypted Masterkey / file containing decrypted Masterkeys / MK file, SID and User Hash / MK file, SID and User Password\n'
+          'Decrypted Masterkey / file containing decrypted Masterkeys / MK file, SID and User Pwd or Hash / MK file and Domain PVK\n'
           'Browser data can be found here:\n'
           '%localappdata%\\{Google/Microsoft}\\{Chrome/Edge}\\User Data\\Local State\n')
     oParser = argparse.ArgumentParser()
@@ -258,7 +258,7 @@ if __name__ == '__main__':
                         bMasterkey = oMK.get_key()
                         print('[+] Success, user masterkey decrypted: ' + bMasterkey.hex())
 
-    ## Option 3 for getting BME Key: User SID + password hash
+    ## Option 3 for getting BME Key: User SID + password (hash)
     if oArgs.mkfile and oArgs.sid and (oArgs.password or oArgs.pwdhash): 
         print('[!] Try MK decryption with user details, might take some time')
         if oArgs.password: oMKP.try_credential(oArgs.sid, oArgs.password)
