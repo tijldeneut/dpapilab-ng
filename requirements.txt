@@ -1,6 +1,10 @@
-dpapick3
+# python3 -m pip install -r requirements.txt
+dpapick3>=0.3.0
 wheel
 pytz
-pycryptodomex
-## Construct v2.5.5 is needed for two python files (vaultdec & creddec) although deprecated (todo)
+pyOpenSSL
 construct-2.5.5-reupload.tar.gz
+## Construct v2.5.5 is needed for 2 python files (vaultdec & creddec) but is deprecated unless installed with the --use-deprecated=legacy-resolver option
+## Manually: python3 -m pip install construct-2.5.5-reupload.tar.gz
+#construct; sys_platform == 'win32'
+#pycryptodomex ## not needed anymore, made the move to pycryptodome (which is dependency of dpapick3)

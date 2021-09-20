@@ -85,4 +85,4 @@ if __name__ == '__main__':
                     vpnblob.decrypt(mk.get_key(), entropy = entropy.rstrip(b'\x00'))
                     if vpnblob.decrypted: 
                         ## Cleartext is a unicode string
-                        print(('[+] OpenVPN profile "{}" has password "{}"'.format(key.name(), vpnblob.cleartext.decode('utf16').rstrip('\x00'))))
+                        print(('[+] OpenVPN profile "{}" has cert password "{}"'.format(key.name(), vpnblob.cleartext.decode('utf16').rstrip('\x00'))))
