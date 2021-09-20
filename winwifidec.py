@@ -86,4 +86,4 @@ if __name__ == '__main__':
                         if wblob.decrypted:
                             wifi_pwd = wblob.cleartext.decode(errors='ignore')
                         break
-                print(('[+] Wi-Fi:{} Password:{}'.format(wifi_name, wifi_pwd)))
+                print(('[+] SSID:     {} \n    Password: {}'.format(wifi_name, wifi_pwd)))
