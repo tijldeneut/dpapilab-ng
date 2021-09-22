@@ -1,5 +1,5 @@
 # python3 -m pip install -r requirements.txt
-dpapick3>=0.3.0
+dpapick3>=0.3.1
 wheel
 pytz
 pyOpenSSL
