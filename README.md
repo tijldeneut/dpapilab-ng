@@ -58,10 +58,10 @@ already unlocked MasterKey (hex format) and an optional entropy.
 **mkinfo.py**: this small utility simply tries to parse a MasterKey file or a
 directory containing MasterKey files.
 
-**mksdec.py**: this utility tries to decrypt the *system* MasterKey
+**mkdecs.py**: this utility tries to decrypt the *system* MasterKey
 files provided, using DPAPI system key stored in LSA secrets.
 
-**mkudec.py**: this utility tries to decrypt the *user* MasterKey 
+**mkdecu.py**: this utility tries to decrypt the *user* MasterKey 
 files provided, using the user password, password hash or Domain PVK file.
 
 **winwifidec.py**: this utility (formerly called wiffy.py) decrypts Windows 
