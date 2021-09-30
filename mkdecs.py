@@ -43,8 +43,8 @@ if __name__ == '__main__':
     """Utility core."""
     usage = (
         'usage: %prog [options] MKfile1 MKfile2 etc.\n\n'
-        'e.g. Windows\\System32\\Microsoft\\Protect\\S-1-5-18\\User\\*\n'
-        'It tries to unlock (decrypt) *system* MasterKey files provided.')
+        'It tries to unlock (decrypt) *system* MasterKey files provided.\n'
+        ' Default System MK location: Windows/System32/Microsoft/Protect/S-1-5-18/User/*')
 
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('--system', metavar='HIVE', dest='system')
