@@ -12,7 +12,7 @@ please see "How to Use" and ask questions.
 Prerequisites:  
 ```
 sudo apt update && sudo apt install -y python3-pip git  
-python3 -m pip install wheel pytz pycryptodomex python-registry dpapick3 construct==2.5.5-reupload #--use-deprecated=legacy-resolver
+python3 -m pip install wheel pytz pycryptodome python-registry dpapick3 construct==2.5.5-reupload #--use-deprecated=legacy-resolver
 ```
 
 The construct package is only needed for creddec.py & vaultdec.py (but not for ngcvaultdec.py) and on Windows requires the `--use-deprecated=legacy-resolver` option
