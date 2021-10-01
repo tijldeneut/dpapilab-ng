@@ -28,7 +28,7 @@ def reverseByte(bByteInput):
 def getCryptUsername(sSoftware, sSID):
     with open(sSoftware, 'rb') as oFile:
         oReg = Registry(oFile)
-        oRegKey = oReg.open('Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Providers\{D6886603-9D2F-4EB2-B667-1971041FA96B}')
+        oRegKey = oReg.open('Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Providers\\{D6886603-9D2F-4EB2-B667-1971041FA96B}')
         for oKey in oRegKey.subkeys():
             if oKey.name() in sSID:
                 return oKey.subkey('UserNames').subkeys()[0].name()

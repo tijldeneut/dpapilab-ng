@@ -48,7 +48,7 @@ if __name__ == '__main__':
     usage = (
         'usage: %prog [options] MKfile1 MKfile2 etc.\n\n'
         'It tries to unlock (decrypt) *user* MasterKey files provided.\n'
-        ' Default User MK location: %localappdata%/Roaming/Microsoft/Protect')
+        ' Default User MK location: %localappdata%\\Roaming\\Microsoft\\Protect\\')
 
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('--sid', '-s', help='Optional: will try to construct from MK path when not provided')

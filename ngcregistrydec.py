@@ -65,7 +65,7 @@ def main(sSOFTWARE, boolOutput = True):
             arrSIDs.append((sSID, bData))
 
         if boolOutput: print('[+] Found ' + str(len(arrSIDs)) + ' stored NgcPin Password(s) in the registry :\n')
-        oKey = oReg.open('Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Providers\{D6886603-9D2F-4EB2-B667-1971041FA96B}')
+        oKey = oReg.open('Microsoft\\Windows\\CurrentVersion\\Authentication\\Credential Providers\\{D6886603-9D2F-4EB2-B667-1971041FA96B}')
         arrUsers = []
         for oSubKey in oKey.subkeys():
             for oItem in arrSIDs:

@@ -44,7 +44,7 @@ if __name__ == '__main__':
     usage = (
         'usage: %prog [options] MKfile1 MKfile2 etc.\n\n'
         'It tries to unlock (decrypt) *system* MasterKey files provided.\n'
-        ' Default System MK location: Windows/System32/Microsoft/Protect/S-1-5-18/User/*')
+        r' Default System MK locations: Windows\System32\Microsoft\Protect\S-1-5-18\{User}')
 
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('--system', metavar='HIVE', dest='system')
@@ -62,16 +62,18 @@ if __name__ == '__main__':
     mkp.addSystemCredential(dpapi_system)
 
     for arg in args:
+        arg = arg.replace('*','')
         if os.path.isfile(arg):
             with open(arg,'rb') as f:
+                if arg == 'Preferred': print('[+] Preferred Key is ' + parseGUID(f.read())[:36])
                 try: mkp.addMasterKey(f.read())
                 except: pass
         else:
-            for file in os.listdir(arg.replace('*','')):
-                filepath = os.path.join(arg.replace('*',''),file)
+            for file in os.listdir(arg):
+                filepath = os.path.join(arg, file)
                 if not os.path.isfile(filepath): break
                 with open(filepath, 'rb') as f:
-                    if file == 'Preferred': print('[+] Preffered Key is ' + parseGUID(f.read())[:36])
+                    if file == 'Preferred': print('[+] Preferred Key is ' + parseGUID(f.read())[:36])
                     try: mkp.addMasterKey(f.read())
                     except: pass
 
