@@ -30,7 +30,7 @@ def check_parameters(options, args):
         sys.exit('You must provide a masterkeys directory!')
     if not options.sid:
         try:
-            options.sid = re.findall(r"S-1-\d+-\d+-\d+-\d+-\d+-\d+", args[0])[0]
+            options.sid = re.findall(r"S-1-\d+-\d+-\d+-\d+-\d+-\d+", options.masterkeydir)[0]
             print('[+] Detected SID: ' + options.sid)
         except:
             pass
