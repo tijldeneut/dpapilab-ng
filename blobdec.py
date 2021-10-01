@@ -20,7 +20,7 @@
 import optparse, os, sys
 
 try:
-    from dpapick3 import blob, masterkey, registry
+    from dpapick3 import blob, masterkey, registry, re
 except ImportError:
     raise ImportError('[-] Missing dpapick3, please install via pip install dpapick3.')
 
