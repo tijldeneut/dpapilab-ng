@@ -21,7 +21,7 @@
 ##   "Get-ADReplBackupKey -Server 192.168.1.1 -Credential (Get-Credential) | Save-DPAPIBlob -DirectoryPath ."
 """ Windows DPAPI user's MasterKeys decryption utility."""
 
-import optparse, sys, re
+import optparse, sys, re, os, hashlib
 
 try:
     from dpapick3 import masterkey
@@ -43,6 +43,14 @@ def check_parameters(options, args):
     if not args:
         sys.exit('[-] You must provide at least one MasterKey file.')
 
+def parseGUID(bData):
+    def reverseByte(bByteInput):
+        sReversed = ''
+        sHexInput = bByteInput.hex()
+        for x in range(-1, -len(str(sHexInput)), -2): sReversed += sHexInput[x-1] + sHexInput[x]
+        return bytes.fromhex(sReversed)
+    return reverseByte(bData[:4]).hex() + '-' + reverseByte(bData[4:6]).hex() + '-' + reverseByte(bData[6:8]).hex() + '-' + bData[8:10].hex() + '-' + bData[10:].hex()
+
 if __name__ == '__main__':
     """Utility core."""
     usage = (
@@ -63,6 +71,8 @@ if __name__ == '__main__':
 
     oMKP = masterkey.MasterKeyPool()
     for arg in args:
+        for sFile in os.listdir(arg): 
+            if sFile == 'Preferred': print('[+] Preferred Key is ' + parseGUID(open(os.path.join(arg, sFile),'rb').read())[:36])
         try: oMKP.loadDirectory(arg.replace('*',''))
         except: pass
         try: oMKP.addMasterKey(open(arg,'rb').read())
@@ -81,5 +91,7 @@ if __name__ == '__main__':
             iDecrypted+=1
             print('[+] MK decrypted: {}'.format(oMKGUID.decode(errors='ignore')))
             print('    Secret: ' + oMK.get_key().hex())
+            print('    SHA1: %s' % hashlib.sha1(oMK.get_key()).hexdigest())
+            #print('    SHA1: %s' % hashlib.sha1(mkey).digest().hex())
     if iDecrypted > 0: print('[+] Success. Decrypted {} out of {} keys'.format(str(iDecrypted), str(len(list(oMKP.keys)))))
     else: print('[-] No luck, try a different approach (NT hash, lsass dump, cleartext password, PVK AD cert, credhist file ...)')
