@@ -17,10 +17,10 @@
 # limitations under the License.
 """ Windows DPAPI BLOB decryption utility."""
 
-import optparse, os, sys
+import optparse, os, sys, re
 
 try:
-    from dpapick3 import blob, masterkey, registry, re
+    from dpapick3 import blob, masterkey, registry
 except ImportError:
     raise ImportError('[-] Missing dpapick3, please install via pip install dpapick3.')
 
