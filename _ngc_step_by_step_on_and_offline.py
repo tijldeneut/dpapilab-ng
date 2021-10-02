@@ -204,10 +204,10 @@ if __name__ == '__main__':
     print('-' * 50)
     print('[!] Final step, please run NGC vault decrypt and copy paste EncData, IV and EncPassword')
     sEncKey =      input('[?] EncData     : ')
+    bDecryptedKey = oCipher.decrypt(bytes.fromhex(sEncKey), b'')
+    print('[+] Got AES key: {}\n'.format(bDecryptedKey.hex()))
     sIV =          input('[?] IV          : ')
     sEncPassword = input('[?] EncPassword : ')
-    bDecryptedKey = oCipher.decrypt(bytes.fromhex(sEncKey), b'')
-    #print(bDecryptedKey.hex())
     from Crypto.Cipher import AES
     oCipher = AES.new(bDecryptedKey, AES.MODE_CBC, bytes.fromhex(sIV))
     bResult = oCipher.decrypt(bytes.fromhex(sEncPassword))
