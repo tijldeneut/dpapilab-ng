@@ -17,33 +17,32 @@
 # limitations under the License.
 """DECRYPTING VAULT FILES (VCRD) """
 
-import optparse, os, sys
-
+import optparse, os, sys, re
 from Crypto.Cipher import AES
 
 try:
-    import dpapick3.blob as blob
-    import dpapick3.masterkey as masterkey
-    import dpapick3.registry as registry
+    from dpapick3 import blob, masterkey, registry
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
-import vaultstruct
-import vaultschema
-
+import vaultstruct, vaultschema
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
     if not args or len(args) != 1:
-        sys.exit('You must provide a vaults directory.')
+        sys.exit('[-] You must provide a vaults directory.')
     elif not os.path.isdir(args[0]):
-        sys.exit('You must provide a vaults directory.')
+        sys.exit('[-] You must provide a vaults directory.')
     if not options.masterkeydir:
-        sys.exit('Cannot decrypt anything without master keys.')
+        sys.exit('[-] Cannot decrypt anything without master keys.')
     if options.system and options.security:
         return
     if not options.sid:
-        sys.exit('You must provide user SID or OS hives!')
+        try:
+            options.sid = re.findall(r"S-1-\d+-\d+-\d+-\d+-\d+-\d+", options.masterkeydir)[0]
+            print('[+] Detected SID: ' + options.sid)
+        except:
+            sys.exit('[-] You must provide the user\'s SID textual string.')
     if not options.password and not options.pwdhash:
         sys.exit(
             'You must provide the user password or the user password hash. '
@@ -104,8 +103,8 @@ if __name__ == '__main__':
         'usage: %prog [options] Vault Directory\n\n'
         'It tries to decrypt Vault VCRD files.\n'
         'E.g.: Windows\\System32\\config\\systemprofile\\AppData\\Local\\Microsoft\\Vault\\<GUID>\n'
-        'or  : %ProgramData%\\Microsoft\\Vault\n'
-        'or  : %localappdata%\\Microsoft\\Vault\n'
+        'or  : %ProgramData%\\Microsoft\\Vault\\<GUID>\n'
+        'or  : %localappdata%\\Microsoft\\Vault\\<GUID>\n'
         'Can work with user MK *or* system MKs')
 
     parser = optparse.OptionParser(usage=usage)
@@ -139,7 +138,6 @@ if __name__ == '__main__':
             mkp.try_credential_hash(options.sid, bytes.fromhex(options.pwdhash))
 
     vaults_dir = args[0]
-    #vpol_filename = os.path.join(os.path.sep, vaults_dir, 'Policy.vpol')
     vpol_filename = os.path.join(vaults_dir, 'Policy.vpol')
 
     with open(vpol_filename, 'rb') as fin:
@@ -159,7 +157,7 @@ if __name__ == '__main__':
     for file in os.listdir(vaults_dir):
         if file.lower().endswith('.vcrd'):
             filepath = os.path.join(vaults_dir, file)
-            print('-'*79)
+            print('-' * 79)
             print('Working on: %s\n' % file)
 
             attributes_data = {}
