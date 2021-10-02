@@ -17,7 +17,7 @@
 # limitations under the License.
 """Decrypt Windows Credential files."""
 
-import construct, optparse, os, sys
+import construct, optparse, os, sys, re
 
 try:
     import vaultstruct
@@ -25,29 +25,32 @@ except ImportError:
     raise ImportError('Missing vaultstruct.py, download it from dpapilab-ng.')
 
 try:
-    import dpapick3.blob as blob
-    import dpapick3.masterkey as masterkey
-    import dpapick3.registry as registry
+    from dpapick3 import blob, registry, masterkey
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
+    if not args or len(args) != 1:
+        sys.exit('[-] You must provide a vaults directory.')
+    elif not os.path.isdir(args[0]):
+        sys.exit('[-] You must provide a vaults directory.')
     if not options.masterkeydir and not options.sysmkdir:
-        sys.exit('Cannot decrypt anything without master keys.')
-    if not options.sid and options.masterkeydir:
-        sys.exit('You must provide the user\'s SID textual string.')
-    if not options.password and not options.pwdhash and not options.system:
+        sys.exit('[-] Cannot decrypt anything without master keys.')
+    if options.system and options.security:
+        return
+    if not options.sid:
+        try:
+            options.sid = re.findall(r"S-1-\d+-\d+-\d+-\d+-\d+-\d+", options.masterkeydir)[0]
+            print('[+] Detected SID: ' + options.sid)
+        except:
+            sys.exit('[-] You must provide the user\'s SID textual string.')
+    if not options.password and not options.pwdhash:
         sys.exit(
             'You must provide the user password or the user password hash. '
-            'The user password hash is SHA1(UTF_LE(password)), and must '
-            'be provided as the hex textual string.\n'
+            'The user password hash is the SHA1(UTF_LE(password)), and must '
+            'be provided as the hex textual string.'
             'If there\'s no password, use pwdhash "da39a3ee5e6b4b0d3255bfef95601890afd80709"')
-    if options.sysmkdir and (not options.system or not options.security):
-        sys.exit('You must provide SYSTEM and SECURITY hives')
-    if not args:
-        sys.exit('You must provide one credential file at least.')
-
 
 def decrypt_blob(mkp, blob):
     """Helper to decrypt blobs."""
@@ -60,7 +63,6 @@ def decrypt_blob(mkp, blob):
                     break
     else:
         return None, 1
-
     if blob.decrypted:
         return blob.cleartext, 0
     return None, 2
@@ -145,6 +147,7 @@ if __name__ == '__main__':
                 enc_cred = vaultstruct.CREDENTIAL_FILE.parse(fin.read())
     
                 cred_blob = blob.DPAPIBlob(enc_cred.data.raw)
+                print('[+] MK GUID: {}'.format(cred_blob.mkguid))
                 #print(cred_blob)
     
                 if umkp:
