@@ -20,29 +20,24 @@
 import optparse, os, re, sys
 
 try:
-    import dpapick3.blob as blob
-    import dpapick3.masterkey as masterkey
-    import dpapick3.registry as registry
+    from dpapick3 import blob, masterkey, registry
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
-    if args:
-        sys.exit('No arguments required.')
-    if not options.security or not options.system:
-        sys.exit('You must provide SYSTEM and SECURITY hives to decrypt username.')
-    if not options.systemmasterkeydir:
-        sys.exit('You must provide the system DPAPI folder, see <usage>.')
-    if not options.ntuser:
-        sys.exit('You must provide the ntuser.dat file (or reg save hkcu ntuser.dat).')
+    if args: sys.exit('Error: No arguments required, see <usage>')
+    if not options.security or not options.system: sys.exit('You must provide SYSTEM and SECURITY hives to decrypt username.')
+    if not options.systemmasterkeydir: sys.exit('You must provide the system DPAPI folder, see <usage>.')
+    if not options.ntuser: sys.exit('You must provide the ntuser.dat file (or reg save hkcu ntuser.dat).')
+    if not options.usermasterkeydir: sys.exit('You must provide the user DPAPI folder, see <usage>.')
     if not options.sid:
-        sys.exit('You must provide the user SID to decrypt password.') 
-    if not options.usermasterkeydir:
-        sys.exit('You must provide the user DPAPI folder, see <usage>.')
-    if not options.password and not options.pwdhash:
-        sys.exit('You must provide the user password or password hash.')
-
+        try:
+            options.sid = re.findall(r"S-1-\d+-\d+-\d+-\d+-\d+-\d+", options.usermasterkeydir)[0]
+            print('[+] Autodetected SID: ' + options.sid)
+        except:
+            sys.exit('You must provide the user\'s SID textual string.')
+    if not options.password and not options.pwdhash: sys.exit('You must provide the user password or password hash.')
 
 if __name__ == '__main__':
     """Utility core."""
@@ -77,6 +72,7 @@ if __name__ == '__main__':
     reg = registry.Regedit()
     secrets = reg.get_lsa_secrets(options.security, options.system)
     dpapi_system = secrets.get('DPAPI_SYSTEM')['CurrVal']
+    #print('[+] SYSTEM DPAPI key: {}'.format(dpapi_system.hex()))
 
     mkp1 = masterkey.MasterKeyPool()
     mkp1.loadDirectory(options.systemmasterkeydir)
@@ -103,7 +99,8 @@ if __name__ == '__main__':
                     continue
                 with open(options.ntuser, 'rb') as f:
                     r = registry.Registry.Registry(f)
-                    hexdata1 = r.open('Software\\Microsoft\\Wlansvc\\UserData\\Profiles\\' + file[:38]).value('MSMUserData').value()
+                    try: hexdata1 = r.open('Software\\Microsoft\\Wlansvc\\UserData\\Profiles\\' + file[:38]).value('MSMUserData').value()
+                    except: sys.exit('[-] Error: No Wi-Fi data in NTUSER, wrong user?')
                     ## DPAPI Blob containing username, possibly domain and another DPAPI blob with password
                     wblob1 = blob.DPAPIBlob(hexdata1)
                     wifi_username = '<not decrypted>'
@@ -125,4 +122,4 @@ if __name__ == '__main__':
                                         wblob2.decrypt(mk2.get_key())
                                         if wblob2.decrypted:
                                             wifi_pwd = wblob2.cleartext.rstrip(b'\x00').decode(errors='ignore')
-                print(('[+] Wi-Fi:{}, Username:{}, Domain:{}, Password:{}'.format(wifi_name, wifi_username, wifi_domain, wifi_pwd)))
+                print(('[+] Wi-Fi: {}\n    Username: {}\n    Domain: {}\n    Password: {}'.format(wifi_name, wifi_username, wifi_domain, wifi_pwd)))

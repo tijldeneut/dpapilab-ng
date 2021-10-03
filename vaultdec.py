@@ -47,7 +47,8 @@ def check_parameters(options, args):
         sys.exit(
             'You must provide the user password or the user password hash. '
             'The user password hash is the SHA1(UTF_LE(password)), and must '
-            'be provided as the hex textual string.')
+            'be provided as the hex textual string.'
+            'If there\'s no password, use pwdhash "da39a3ee5e6b4b0d3255bfef95601890afd80709"')
 
 
 def decrypt_blob(mkp, blob):

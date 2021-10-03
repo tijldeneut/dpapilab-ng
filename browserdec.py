@@ -30,8 +30,7 @@ import argparse, os, json, base64, sqlite3, time, warnings, re
 from Crypto.Cipher import AES
 warnings.filterwarnings("ignore")
 try:
-    import dpapick3.blob as blob
-    import dpapick3.masterkey as masterkey
+    from dpapick3 import blob, masterkey
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3')
 

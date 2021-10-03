@@ -20,9 +20,7 @@
 import optparse, os, re, sys
 
 try:
-    import dpapick3.blob as blob
-    import dpapick3.masterkey as masterkey
-    import dpapick3.registry as registry
+    from dpapick3 import blob, masterkey, registry
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
@@ -30,10 +28,14 @@ def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
     if not args or not len(args) == 1:
         sys.exit('[-] You must provide the ntuser.dat file (or reg save hkcu ntuser.dat).')
-    if not options.sid:
-        sys.exit('[-] You must provide the user SID to decrypt password.') 
     if not options.masterkeydir:
         sys.exit('[-] You must provide the user DPAPI folder, see <usage>.')
+    if not options.sid:
+        try:
+            options.sid = re.findall(r"S-1-\d+-\d+-\d+-\d+-\d+-\d+", options.masterkeydir)[0]
+            print('[+] Detected SID: ' + options.sid)
+        except:
+            sys.exit('[-] You must provide the user\'s SID textual string.')
     if not options.password and not options.pwdhash:
         sys.exit('[-] You must provide the user password or password hash.')
 
