@@ -19,13 +19,13 @@
     C:\Windows\ServiceProfiles\LocalService\AppData\Roaming\Microsoft\Crypto\Keys
     ==> These contain ECS or RSA Public and Private keys
 """
+## The default (9999) will perform a brute force of all 4 digit PIN combinations
+iMaxPIN = 9999
 
-import optparse, os, re, sys, time, hashlib, hmac
+import optparse, os, sys, time, hashlib
 
 try:
-    import dpapick3.blob as blob
-    import dpapick3.masterkey as masterkey
-    import dpapick3.registry as registry
+    from dpapick3 import blob, masterkey, registry
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
@@ -136,8 +136,8 @@ def decryptWithPIN(mk, pkBlob, sSalt, iRounds, sPIN):
     return pkBlob
 
 def brutePIN(mk, pkBlob, sSalt, iRounds):
-    for i in range(0,9999):
-        PIN = f"{i:04d}"
+    for i in range(0, iMaxPIN): ## Default 9999
+        PIN = f"{i:04d}"  ## Watch out, when Max PIN is e.g. 99999, it will start from 0000 to 99999
         if int(PIN)%1000 == 0: print('[!] Trying PINs ' + PIN + ' - ' + str(1000+int(PIN)))
         pkResult = decryptWithPIN(mk, pkBlob, sSalt, iRounds, PIN)
         if pkResult.decrypted:
@@ -198,7 +198,7 @@ def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutp
                                 if not sPIN == '':
                                     pkResult = decryptWithPIN(mk, pkBlob, sSalt, iRounds, sPIN)
                                 else:
-                                    if boolOutput: print('[!] Trying PIN brute force 0000 through 9999, this will take some time ...')
+                                    if boolOutput: print('[!] Trying PIN brute force 0000 through {}, this will take some time '.format(iMaxPIN))
                                     (pkResult, sPIN) = brutePIN(mk, pkBlob, sSalt, iRounds)
                                 if pkResult and pkResult.decrypted:
                                     if boolOutput:
