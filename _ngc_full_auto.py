@@ -16,7 +16,7 @@ This script mostly calls the other scripts in order, step by step
 def check_parameters(options, args):
     if not args or len(args) != 1:
         sys.exit('You must provide the Windows folder.')
-    if not options.pin and not options.pinbrute:
+    if not options.pin and not options.pinbrute and not options.tpm:
         sys.exit('You must provide either a PIN or the pinbrute option.')
 
 def reverseByte(bByteInput):

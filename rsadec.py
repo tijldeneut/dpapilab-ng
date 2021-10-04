@@ -21,10 +21,10 @@ The resulting PFX files can be imported into any Windows machine to read EFS fol
 ntfsdecrypt -k <name.pfx> /dev/sda Users\User\Desktop\Encrypted_Folder\hiddenfile.txt
 '''
 
-import argparse, os, base64, warnings, re, OpenSSL
+import argparse, os, warnings, re, OpenSSL
 warnings.filterwarnings("ignore")
 try:
-    from dpapick3 import blob, masterkey
+    from dpapick3 import masterkey
     from dpapick3.probes import certificate
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3')

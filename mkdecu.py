@@ -30,7 +30,7 @@ except ImportError:
 
 def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
-    if not options.sid:
+    if not options.sid and not options.pvk:
         try:
             options.sid = re.findall(r"S-1-\d+-\d+-\d+-\d+-\d+-\d+", args[0])[0]
             print('[+] Detected SID: ' + options.sid)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     usage = (
         'usage: %prog [options] MKfile1 MKfile2 etc.\n\n'
         'It tries to unlock (decrypt) *user* MasterKey files provided.\n'
-        ' Default User MK location: %localappdata%\\Roaming\\Microsoft\\Protect\\')
+        ' Default User MK location: %appdata%\\Microsoft\\Protect\\')
 
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('--sid', '-s', help='Optional: will try to construct from MK path when not provided')
