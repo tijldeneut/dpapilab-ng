@@ -124,7 +124,7 @@ def parseField1(bData, boolVerbose = True):
 def decryptWithPIN(mk, pkBlob, sSalt, iRounds, sPIN):
     sHexPIN = ''
     if not len(sPIN) == 64: 
-        for x in sPIN: sHexPIN += '3300' + x.encode('UTF-16LE').hex() ## Windows HELLO PIN
+        sHexPIN = sPIN.encode().hex().encode('UTF-16LE').hex() ## Windows HELLO PIN
     else:
         sHexPIN = sPIN.upper().encode('UTF-16LE').hex()
     bPIN = hashlib.pbkdf2_hmac('sha256', bytes.fromhex(sHexPIN), bytes.fromhex(sSalt), iRounds).hex().upper().encode('UTF-16LE')
