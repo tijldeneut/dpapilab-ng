@@ -87,6 +87,9 @@ Using many different ways (masterkeys, SHA1/NT hashes or AD PVK file)
 **openvpndec.py**: this utility tries to decrypt OpenVPN certificate passphrases
 that are stored in ``NTUSER.dat`` and encrypted with the User MasterKey
 
+**cloudprtdec.py**: decrypt Cloud AP PRT cookies from lsass.dmp using System MasterKey
+to perform pass-the-PRT cookie
+
 The NGC files are accompanied by an article, read it here: 
 https://www.insecurity.be/blog/2020/12/24/dpapi-in-depth-with-tooling-standalone-dpapi/
 
