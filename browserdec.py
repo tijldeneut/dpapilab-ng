@@ -90,7 +90,7 @@ def parseLoginFile(sLoginFile, lstGUIDs):
     oConn = sqlite3.connect(sLoginFile)
     oCursor = oConn.cursor()
     try:
-        oCursor.execute('SELECT action_url, username_value, password_value FROM logins')
+        oCursor.execute('SELECT origin_url, username_value, password_value FROM logins')
         for lstData in oCursor.fetchall():
             if lstData[2][:4] == b'\x01\x00\x00\x00': 
                 oBlob = blob.DPAPIBlob(lstData[2])
