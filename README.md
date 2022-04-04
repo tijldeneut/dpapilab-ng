@@ -36,7 +36,8 @@ Installation (Windows):
 First install the latest version of Python3.  
 ```
 powershell iwr https://github.com/tijldeneut/dpapilab-ng/archive/refs/heads/main.zip -O dpapilabng.zip  
-powershell expand-archive dpapilabng.zip ; cd dpapilabng\dpapilab-ng-main  
+powershell expand-archive dpapilabng.zip  
+cd dpapilabng\dpapilab-ng-main  
 python -m pip install -r requirements.txt
 ```
 
