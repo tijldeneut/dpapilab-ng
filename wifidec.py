@@ -40,15 +40,15 @@ if __name__ == '__main__':
     usage = (
         'usage: %prog [options] WDIR\n\n'
         'It decrypts Windows WiFi password stored in '
-        '\\ProgramData\\Microsoft\\WlanSvc files. '
-        'You must provide such directory, SYSTEM and SECURITY hives and, '
+        '\\ProgramData\\Microsoft\\Wlansvc\n'
+        'You must provide such directory, SYSTEM and SECURITY hives and,\n'
         'finally, the system DPAPI MasterKeys, stored in '
-        '\\Windows\\System32\\Microsoft\\Protect\\S-1-5-18\\User.')
+        r'\Windows\System32\Microsoft\Protect\S-1-5-18\User')
 
     parser = optparse.OptionParser(usage=usage)
-    parser.add_option('--masterkey', metavar='DIRECTORY', dest='masterkeydir')
-    parser.add_option('--system', metavar='HIVE', dest='system')
-    parser.add_option('--security', metavar='HIVE', dest='security')
+    parser.add_option('--system', metavar='HIVE', default=os.path.join('Windows','System32','config','SYSTEM'), help=r'SYSTEM file; default: Windows\System32\config\SYSTEM')
+    parser.add_option('--security', metavar='HIVE', default=os.path.join('Windows','System32','config','SECURITY'), help=r'SECURITY file; default: Windows\System32\config\SECURITY')
+    parser.add_option('--masterkey', metavar='FOLDER', default=os.path.join('Windows','System32','Microsoft','Protect','S-1-5-18','User'), dest='masterkeydir', help=r'Masterkey folder; default: Windows\System32\Microsoft\Protect\S-1-5-18\User')
 
     (options, args) = parser.parse_args()
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
                 key_material_re = re.search(
                     '<keyMaterial>([0-9A-F]+)</keyMaterial>', file_data)
                 if not key_material_re:
-                    if re.search('<EAPConfig>', file_data): print(('[!] The pass for EAP profile ' + wifi_name + ' (' + file  + ')'  +  ' is in the registry'))
+                    if re.search('<EAPConfig>', file_data): print(('[!] The pass for EAP profile ' + wifi_name + ' (' + file  + ')'  +  ' is in the NTUSER.dat registry'))
                     else: print(('[-] No key for: ' + wifi_name))
                     continue
                 key_material = bytes.fromhex(key_material_re.group(1))

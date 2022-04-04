@@ -37,7 +37,10 @@ def check_parameters(options, args):
             print('[+] Autodetected SID: ' + options.sid)
         except:
             sys.exit('You must provide the user\'s SID textual string.')
-    if not options.password and not options.pwdhash: sys.exit('You must provide the user password or password hash.')
+    if not options.password and not options.pwdhash: 
+        print('[!] No password provided, assuming user has no password.')
+        options.pwdhash = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
+        #sys.exit('You must provide the user password or password hash.')
 
 if __name__ == '__main__':
     """Utility core."""
@@ -54,14 +57,14 @@ if __name__ == '__main__':
         )
 
     parser = optparse.OptionParser(usage=usage)
-    parser.add_option('--systemmasterkey', metavar='DIRECTORY', dest='systemmasterkeydir')
-    parser.add_option('--system', metavar='HIVE', dest='system')
-    parser.add_option('--security', metavar='HIVE', dest='security')
-    parser.add_option('--wdir', metavar='WIFIDIR', dest='wifi_dir')
+    parser.add_option('--systemmasterkey', metavar='FOLDER',default=os.path.join('Windows','System32','Microsoft','Protect','S-1-5-18','User') , dest='systemmasterkeydir', help=r'System Masterkey folder; default: Windows\System32\Microsoft\Protect\S-1-5-18\User')
+    parser.add_option('--system', metavar='HIVE', default=os.path.join('Windows','System32','config','SYSTEM'), help=r'SYSTEM file; default: Windows\System32\config\SYSTEM')
+    parser.add_option('--security', metavar='HIVE', default=os.path.join('Windows','System32','config','SECURITY'), help=r'SECURITY file; default: Windows\System32\config\SECURITY')
+    parser.add_option('--wdir', metavar='WIFIDIR', dest='wifi_dir', default=os.path.join('ProgramData','Microsoft','Wlansvc'), help=r'WiFi folder; default ProgramData\Microsoft\Wlansvc')
     parser.add_option('--ntuser', metavar='NTUSER', dest='ntuser')
     parser.add_option('--usermasterkey', metavar='DIRECTORY', dest='usermasterkeydir')
-    parser.add_option('--sid', metavar='SID', dest='sid')
-    parser.add_option('--password', metavar='PASSWORD', dest='password')
+    parser.add_option('--sid', metavar='SID', dest='sid', help=r'Carved from the User Masterkey folder, if possible')
+    parser.add_option('--password', metavar='PASSWORD', dest='password', help='Optional: Will use empty password when not provided')
     parser.add_option('--pwdhash', metavar='HASH', dest='pwdhash')
     parser.add_option('--credhist', metavar='FILE', dest='credhist')
 

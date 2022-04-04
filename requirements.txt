@@ -3,6 +3,7 @@ dpapick3>=0.3.3
 wheel
 pytz
 pyOpenSSL
+lxml
 construct-2.5.5-reupload.tar.gz
 ## Construct v2.5.5 is needed for 2 python files (vaultdec & creddec) but is deprecated unless installed with the --use-deprecated=legacy-resolver option
 ## Manually: python3 -m pip install construct-2.5.5-reupload.tar.gz

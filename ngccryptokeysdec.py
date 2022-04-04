@@ -33,14 +33,16 @@ def check_parameters(options, args):
     """Simple checks on the parameters set by the user."""
     if not args or len(args) != 1:
         sys.exit('You must provide crypto keys directory.')
-    if not options.pinguid and (options.pin or options.pinbrute):
-        sys.exit('You must provide a pinGUID when trying to decrypt or brute force with PIN (run NGC first).')
-    if options.pinguid and not (options.pin or options.pinbrute):
-        sys.exit('You must provide a PIN or enable the brute force option.')
+    if not options.pinguid and (options.pin or options.pinbrute or options.pinexport):
+        sys.exit('You must provide a pinGUID when trying to decrypt, brute force or export with PIN (run ngcparse.py first).')
+    if options.pinguid and not (options.pin or options.pinbrute or options.pinexport):
+        sys.exit('You must provide a PIN or enable the brute force / export hash option.')
+    if options.masterkeydir and (not options.system or not options.security):
+        sys.exit('You must provide system and security hives.')
 
-def reverseByte(sByteInput):
+def reverseByte(bByteInput):
     sReversed = ''
-    sHexInput = sByteInput.hex()
+    sHexInput = bByteInput.hex()
     for x in range(-1, -len(str(sHexInput)), -2): sReversed += sHexInput[x-1] + sHexInput[x]
     return bytes.fromhex(sReversed)
 
@@ -123,7 +125,7 @@ def parseField1(bData, boolVerbose = True):
 
 def decryptWithPIN(mk, pkBlob, sSalt, iRounds, sPIN):
     sHexPIN = ''
-    if not len(sPIN) == 64: 
+    if not len(sPIN) == 64:
         sHexPIN = sPIN.encode().hex().upper().encode('UTF-16LE').hex() ## Windows HELLO PIN
     else:
         sHexPIN = sPIN.upper().encode('UTF-16LE').hex()
@@ -134,6 +136,16 @@ def decryptWithPIN(mk, pkBlob, sSalt, iRounds, sPIN):
     bPIN = hashlib.sha512(bPIN).digest()
     pkBlob.decrypt(mk.get_key(), entropy = b'xT5rZW5qVVbrvpuA\x00', smartCardSecret = bPIN)
     return pkBlob
+
+def exportHASH(mk, pkBlob, sSalt, iRounds, sPINGUID):
+    ## HASH FORMAT: $WINHELLO$*SHA512*rounds*salt*sign*masterkey*hmac*verify*entropy
+    ### Sources and thanks: https://hashcat.net/forum/thread-10461.html
+    bEntropy = b'xT5rZW5qVVbrvpuA\x00'
+    sHash = f'$WINHELLO$*{pkBlob.hashAlgo.name.upper()}*{iRounds}*{sSalt}*{pkBlob.sign.hex()}*{mk.get_key().hex()}*{pkBlob.hmac.hex()}*{pkBlob.blob.hex()}*{bEntropy.hex()}'
+    sFilename = '{}.hc28100'.format(sPINGUID.replace('{','').replace('}',''))
+    open(sFilename,'a').write(sHash+'\n')
+    print(f'\n[!] Exported PIN hash to file: {sFilename}')
+    return
 
 def brutePIN(mk, pkBlob, sSalt, iRounds):
     for i in range(0, iMaxPIN): ## Default 9999
@@ -195,11 +207,14 @@ def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutp
                                 for sProperty in arrPrivateKeyProperties:
                                     if sProperty['Name'].decode('UTF-16LE',errors='ignore') == 'NgcSoftwareKeyPbkdf2Salt': sSalt = sProperty['Value'].hex()
                                     elif sProperty['Name'].decode('UTF-16LE',errors='ignore') == 'NgcSoftwareKeyPbkdf2Round': iRounds = int(reverseByte(sProperty['Value']).hex(),16)
-                                if not sPIN == '':
+                                if sPIN and not sPIN == '':
                                     pkResult = decryptWithPIN(mk, pkBlob, sSalt, iRounds, sPIN)
-                                else:
+                                elif options.pinbrute:
                                     if boolOutput: print('[!] Trying PIN brute force 0000 through {}, this will take some time '.format(iMaxPIN))
                                     (pkResult, sPIN) = brutePIN(mk, pkBlob, sSalt, iRounds)
+                                elif options.pinexport:
+                                    exportHASH(mk, pkBlob, sSalt, iRounds, sPINGUID)
+                                    pkResult = None
                                 if pkResult and pkResult.decrypted:
                                     if boolOutput:
                                         print('[+] Private Key decrypted with PIN (' + sPIN + ') :')
@@ -207,7 +222,7 @@ def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutp
                                     else: ## no bool output means: called by other script that is only interested in this cleartext data
                                         return pkBlob.cleartext
                                 else:
-                                    if boolOutput: print('[-] Decryption with PIN tried but failed')
+                                    if sPIN and boolOutput: print('[-] Decryption with PIN tried but failed')
                             else:
                                 if boolOutput: print('[-] Entropy unknown for ' + pkBlob.description.decode())
                             
@@ -225,11 +240,12 @@ if __name__ == '__main__':
         'Optionally enter a Windows Hello GUID and (PIN or pinbrute) to decrypt certain fields')
 
     parser = optparse.OptionParser(usage=usage)
-    parser.add_option('--masterkey', metavar='DIRECTORY', dest='masterkeydir')
-    parser.add_option('--system', metavar='HIVE', dest='system')
-    parser.add_option('--security', metavar='HIVE', dest='security')
+    parser.add_option('--masterkey', metavar='FOLDER',default=os.path.join('Windows','System32','Microsoft','Protect','S-1-5-18','User') , dest='masterkeydir', help=r'System Masterkey folder; default: Windows\System32\Microsoft\Protect\S-1-5-18\User')
+    parser.add_option('--system', metavar='HIVE', default=os.path.join('Windows','System32','config','SYSTEM'), help=r'SYSTEM file; default: Windows\System32\config\SYSTEM')
+    parser.add_option('--security', metavar='HIVE', default=os.path.join('Windows','System32','config','SECURITY'), help=r'SECURITY file; default: Windows\System32\config\SECURITY')
     parser.add_option('--pinguid', metavar='STRING', dest='pinguid', help='Specify the GUID to try PIN on')
     parser.add_option('--pin', metavar='STRING', dest='pin', help='Try decryption with PIN')
+    parser.add_option('--pinexport', metavar='BOOL', dest='pinexport', action="store_true", help='When simple brute force fails, export PIN as Hashcat hash to a file hc28100')
     parser.add_option('--pinbrute', metavar='BOOL', dest='pinbrute', action="store_true", help='Brute force PIN 0000 to 9999')
 
     (options, args) = parser.parse_args()

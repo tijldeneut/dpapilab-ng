@@ -17,7 +17,7 @@
 # limitations under the License.
 """ Windows DPAPI system's MasterKeys decryption utility."""
 
-import hashlib, optparse, os, re, sys
+import hashlib, optparse, os, sys
 
 try:
     from dpapick3 import masterkey, registry
@@ -47,11 +47,11 @@ if __name__ == '__main__':
         r' Default System MK locations: Windows\System32\Microsoft\Protect\S-1-5-18\{User}')
 
     parser = optparse.OptionParser(usage=usage)
-    parser.add_option('--system', metavar='HIVE', dest='system')
-    parser.add_option('--security', metavar='HIVE', dest='security')
+    parser.add_option('--system', metavar='HIVE', default=os.path.join('Windows','System32','config','SYSTEM'), help=r'SYSTEM file; default: Windows\System32\config\SYSTEM')
+    parser.add_option('--security', metavar='HIVE', default=os.path.join('Windows','System32','config','SECURITY'), help=r'SECURITY file; default: Windows\System32\config\SECURITY')
 
     (options, args) = parser.parse_args()
-
+    
     check_parameters(options, args)
 
     reg = registry.Regedit()
