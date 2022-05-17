@@ -22,10 +22,12 @@
 ## The default (9999) will perform a brute force of all 4 digit PIN combinations
 iMaxPIN = 9999
 
-import optparse, os, sys, time, hashlib
+import optparse, os, sys, time, hashlib, binascii
+from pathlib import Path
 
 try:
     from dpapick3 import blob, masterkey, registry
+    from dpapick3.probes.certificate import PrivateKeyBlob, BcryptPrivateKeyBlob
 except ImportError:
     raise ImportError('Missing dpapick3, please install via pip install dpapick3.')
 
@@ -105,6 +107,9 @@ def parseField1(bData, boolVerbose = True):
     if boolVerbose:
         print('[+] ' + sHeader1 + '             : ' + sHeader2)
     bRemainder = bData[iSizeTotalHeader:] ## Next 4 bytes should be the size of this remainder
+    if len(bRemainder) == 0:
+        print('[-] Not able to pearse Field 1')
+        return None
     iRemainderSize = int(reverseByte(bRemainder[:4]).hex(), 16)
     if not len(bRemainder) == iRemainderSize: 
         print('[-] Not able to pearse Field 1')
@@ -157,7 +162,24 @@ def brutePIN(mk, pkBlob, sSalt, iRounds):
             return (pkResult, PIN)
     return (pkBlob, '')
 
-def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutput = True):
+
+def savePEM(private_key_hex: str, pem_path: str, pemname: str):
+    try:
+        rsa_private_key = PrivateKeyBlob.RSAKey(binascii.a2b_hex(private_key_hex))
+    except:
+        print("[-] Error parsing private key as Full RSA Key")
+        print("[*] Trying parsing private key as Bcrypt RSA Key...")
+        try:
+            rsa_private_key = BcryptPrivateKeyBlob.RSAKey(binascii.a2b_hex(private_key_hex))
+        except:
+            print("[-] Error parsing private key as Bcrypt RSA Key")
+            return
+    pem_path = str(Path(pem_path).absolute())+"/"+pemname+".pem"
+    Path(pem_path).write_bytes(rsa_private_key.export_pkcs12())
+    print("[+] PEM saved in {}".format(pem_path))
+
+
+def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutput = True, pemexport=""):
     ## if sPIN == '', do brute force
     if sSystem:
         reg = registry.Regedit()
@@ -198,10 +220,12 @@ def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutp
                 mks = mkp.getMasterKeys(pkBlob.mkguid.encode())
                 for mk in mks:
                     if mk.decrypted:
-                        pkBlob.decrypt(mk.get_key(), entropy = b'xT5rZW5qVVbrvpuA\x00', strongPassword='None')
+                        pkBlob.decrypt(mk.get_key(), entropy = b'xT5rZW5qVVbrvpuA\x00', strongPassword=None)
                         if pkBlob.decrypted and boolOutput:
                             print('[+] Private Key decrypted : ')
                             print('    ' + pkBlob.cleartext.hex())
+                            if pemexport:
+                                savePEM(pkBlob.cleartext.hex(), pem_path=pemexport, pemname=sInfo)
                         else:
                             if sPINGUID and sPINGUID in sInfo and arrPrivateKeyProperties:
                                 for sProperty in arrPrivateKeyProperties:
@@ -247,6 +271,7 @@ if __name__ == '__main__':
     parser.add_option('--pin', metavar='STRING', dest='pin', help='Try decryption with PIN')
     parser.add_option('--pinexport', metavar='BOOL', dest='pinexport', action="store_true", help='When simple brute force fails, export PIN as Hashcat hash to a file hc28100')
     parser.add_option('--pinbrute', metavar='BOOL', dest='pinbrute', action="store_true", help='Brute force PIN 0000 to 9999')
+    parser.add_option('--pemexport', metavar='FOLDER', dest='pemexport', help='Folder to export private RSA keys as PEM files')
 
     (options, args) = parser.parse_args()
 
@@ -254,4 +279,4 @@ if __name__ == '__main__':
     
     if options.pinbrute: sPIN = ''
     else: sPIN = options.pin
-    main(args[0], options.masterkeydir, options.system, options.security, sPIN, options.pinguid)
+    main(args[0], options.masterkeydir, options.system, options.security, sPIN, options.pinguid, True, options.pemexport)
