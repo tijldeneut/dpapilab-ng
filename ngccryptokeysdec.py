@@ -179,7 +179,7 @@ def savePEM(private_key_hex: str, pem_path: str, pemname: str):
     print("[+] PEM saved in {}".format(pem_path))
 
 
-def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutput = True, pemexport=""):
+def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutput = True, pemexport="", sid=None, password=None):
     ## if sPIN == '', do brute force
     if sSystem:
         reg = registry.Regedit()
@@ -190,7 +190,12 @@ def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutp
     if sMasterkey:
         mkp.loadDirectory(sMasterkey)
         mkp.addSystemCredential(dpapi_system)
-        mkp.try_credential_hash(None, None)
+        decrn=mkp.try_credential_hash(None, None)
+        #print("Decrypted keys %d" % decrn)
+
+    if sid:
+        if password:
+            mkp.try_credential(options.sid, options.password)
 
     for root, _, files in os.walk(sCryptoFolder):
         for sFile in files:
@@ -267,6 +272,9 @@ if __name__ == '__main__':
     parser.add_option('--masterkey', metavar='FOLDER',default=os.path.join('Windows','System32','Microsoft','Protect','S-1-5-18','User') , dest='masterkeydir', help=r'System Masterkey folder; default: Windows\System32\Microsoft\Protect\S-1-5-18\User')
     parser.add_option('--system', metavar='HIVE', default=os.path.join('Windows','System32','config','SYSTEM'), help=r'SYSTEM file; default: Windows\System32\config\SYSTEM')
     parser.add_option('--security', metavar='HIVE', default=os.path.join('Windows','System32','config','SECURITY'), help=r'SECURITY file; default: Windows\System32\config\SECURITY')
+    parser.add_option('--sid', metavar='SID', dest='sid')
+    parser.add_option('--credhist', metavar='FILE', dest='credhist')
+    parser.add_option('--password', metavar='PASSWORD', dest='password')
     parser.add_option('--pinguid', metavar='STRING', dest='pinguid', help='Specify the GUID to try PIN on')
     parser.add_option('--pin', metavar='STRING', dest='pin', help='Try decryption with PIN')
     parser.add_option('--pinexport', metavar='BOOL', dest='pinexport', action="store_true", help='When simple brute force fails, export PIN as Hashcat hash to a file hc28100')
@@ -279,4 +287,4 @@ if __name__ == '__main__':
     
     if options.pinbrute: sPIN = ''
     else: sPIN = options.pin
-    main(args[0], options.masterkeydir, options.system, options.security, sPIN, options.pinguid, True, options.pemexport)
+    main(args[0], options.masterkeydir, options.system, options.security, sPIN, options.pinguid, True, options.pemexport, options.sid, options.password)
