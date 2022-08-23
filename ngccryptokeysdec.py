@@ -193,8 +193,7 @@ def main(sCryptoFolder, sMasterkey, sSystem, sSecurity, sPIN, sPINGUID, boolOutp
         decrn=mkp.try_credential_hash(None, None)
         #print("Decrypted keys %d" % decrn)
 
-    if sid:
-        if password:
+    if sid and password:
             mkp.try_credential(options.sid, options.password)
 
     for root, _, files in os.walk(sCryptoFolder):
